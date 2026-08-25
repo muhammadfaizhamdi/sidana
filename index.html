@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinTech Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#ffd2be",
+                      "inverse-on-surface": "#f3effc",
+                      "tertiary": "#7e3000",
+                      "surface-container-low": "#f5f2ff",
+                      "tertiary-container": "#a44100",
+                      "primary-container": "#4f46e5",
+                      "on-primary-fixed-variant": "#3323cc",
+                      "on-secondary-fixed-variant": "#005236",
+                      "surface-container-highest": "#e4e1ee",
+                      "on-secondary-fixed": "#002113",
+                      "on-error": "#ffffff",
+                      "outline": "#777587",
+                      "background": "#fcf8ff",
+                      "secondary-container": "#6cf8bb",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#e4e1ee",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-container": "#dad7ff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "on-secondary-container": "#00714d",
+                      "outline-variant": "#c7c4d8",
+                      "primary-fixed": "#e2dfff",
+                      "secondary-fixed-dim": "#4edea3",
+                      "on-error-container": "#93000a",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#dcd8e5",
+                      "on-primary": "#ffffff",
+                      "primary": "#3525cd",
+                      "tertiary-fixed": "#ffdbcc",
+                      "on-surface-variant": "#464555",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed-dim": "#c3c0ff",
+                      "surface-bright": "#fcf8ff",
+                      "surface-tint": "#4d44e3",
+                      "inverse-primary": "#c3c0ff",
+                      "secondary": "#006c49",
+                      "inverse-surface": "#302f39",
+                      "surface-container-high": "#eae6f4",
+                      "surface": "#fcf8ff",
+                      "on-primary-fixed": "#0f0069",
+                      "surface-container": "#f0ecf9",
+                      "on-background": "#1b1b24",
+                      "on-tertiary-fixed": "#351000",
+                      "on-surface": "#1b1b24",
+                      "secondary-fixed": "#6ffbbe"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "lg": "2.5rem",
+                      "sm": "1rem",
+                      "base": "4px",
+                      "xl": "4rem",
+                      "margin-mobile": "16px",
+                      "max-width": "1280px",
+                      "md": "1.5rem",
+                      "xs": "0.5rem"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "data-tabular": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-tabular": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Slate-50 fallback */
+            color: #1e293b; /* Slate-800 */
+        }
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .glass-modal {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.04);
+        }
+        
+        .scanline {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+            box-shadow: 0 0 10px #4f46e5, 0 0 20px #4f46e5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scan 2s linear infinite;
+            display: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        
+        /* Utility classes for views */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen relative overflow-x-hidden">
+<!-- Background Shader -->
+<div class="fixed inset-0 z-[-1] pointer-events-none opacity-20">
+<!-- STITCH_SHADER_START:ANIMATION_3 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_3" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_3');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // Create a slow, evolving mesh gradient
+    float t1 = u_time * 0.1;
+    float t2 = u_time * 0.15;
+    
+    vec3 color1 = vec3(0.31, 0.27, 0.90); // Indigo-600 #4f46e5
+    vec3 color2 = vec3(0.06, 0.73, 0.51); // Emerald-500 #10b981
+    vec3 color3 = vec3(0.96, 0.97, 0.99); // Slate-50 #f8fafc
+    
+    float noise1 = sin(uv.x * 3.0 + t1) * cos(uv.y * 2.0 - t2);
+    float noise2 = cos(uv.x * 2.0 - t2) * sin(uv.y * 3.0 + t1);
+    
+    vec3 finalColor = mix(color3, color1, 0.05 + 0.05 * noise1);
+    finalColor = mix(finalColor, color2, 0.03 + 0.03 * noise2);
+    
+    gl_FragColor = vec4(finalColor, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_3 -->
+</div>
+<!-- Desktop Side Navigation (from JSON) -->
+<nav class="h-full w-64 fixed left-0 top-0 hidden lg:flex flex-col p-md h-screen bg-white/80 dark:bg-inverse-surface/80 backdrop-blur-xl border-r border-white/50 shadow-md z-40">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">FinTech Pro</h1>
+<p class="font-label-sm text-label-sm text-outline mt-1">Institutional Grade</p>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="nav-item flex items-center gap-3 p-3 rounded-lg text-primary dark:text-primary-fixed-dim bg-primary-fixed/20 active:translate-x-1 duration-200" data-view="dashboard" href="#" onclick="switchView('dashboard')">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="nav-item flex items-center gap-3 p-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:translate-x-1 duration-200" data-view="ledger" href="#" onclick="switchView('ledger')">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-md text-body-md">Ledger</span>
+</a>
+<a class="nav-item flex items-center gap-3 p-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:translate-x-1 duration-200" data-view="scan" href="#" onclick="switchView('scan')">
+<span class="material-symbols-outlined" data-icon="document_scanner">document_scanner</span>
+<span class="font-body-md text-body-md">Scan</span>
+</a>
+<a class="nav-item flex items-center gap-3 p-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:translate-x-1 duration-200" data-view="analytics" href="#" onclick="switchView('analytics')">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-body-md text-body-md">Analytics</span>
+</a>
+</div>
+<button class="mt-4 mb-8 bg-primary text-on-primary py-3 px-4 rounded-lg font-body-md text-body-md shadow-sm hover:opacity-90 transition-opacity" onclick="openModal()">
+            Add Transaction
+        </button>
+<div class="mt-auto border-t border-outline-variant/30 pt-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="lg:ml-64 p-margin-mobile md:p-gutter max-w-max-width mx-auto min-h-screen pb-24 lg:pb-8">
+<!-- View: Dashboard -->
+<section class="view-section active" id="view-dashboard">
+<header class="mb-lg flex justify-between items-center">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Overview</h2>
+<p class="font-body-md text-body-md text-outline mt-1">Welcome back, here's your financial summary.</p>
+</div>
+<div class="hidden md:flex items-center gap-4">
+<button class="p-2 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<i class="w-5 h-5" data-lucide="bell"></i>
+</button>
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A clean, professional headshot of a person looking confident, well-lit, isolated on a light gray background, conveying a sense of premium financial trustworthiness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2WdUgH-MPWaM5nxYO-c-pqb1CyjN_Rn6nB3dgTvOMFcvynUGUAKmic9h0ojq87SVSd1JJatLK4m8gVRV2gCd8HQY66LTBnki0l6Z4g5EikUn0wUgjQRjp2-VJp7CQwxBEYhreKq91NchPhitLWolE3qyF4dykh4Kcws7ZI_S6N0mTNZ6gmlhw87O8jSWR0UwK4FOFVS5NN4I2VI_Ku7fTZo03N0oFgTztHk2hlntslDbX_qb58WDo"/>
+</div>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-lg">
+<!-- Hero Card -->
+<div class="glass-panel rounded-xl p-lg md:col-span-8 relative overflow-hidden">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Total Net Worth</p>
+<div class="flex items-baseline gap-4 mt-2">
+<h3 class="font-display-lg text-display-lg text-on-surface tracking-tight">$124,592.00</h3>
+<span class="inline-flex items-center gap-1 bg-secondary-container/20 text-secondary px-2 py-1 rounded font-data-tabular text-data-tabular">
+<i class="w-4 h-4" data-lucide="trending-up"></i>
+                                +2.4%
+                            </span>
+</div>
+<p class="font-body-md text-body-md text-outline mt-4">vs last month ($121,671.87)</p>
+<div class="mt-8 flex gap-4">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-body-md text-body-md hover:bg-primary/90 transition-colors">Deposit</button>
+<button class="bg-white/50 border border-white text-primary px-6 py-2 rounded-lg font-body-md text-body-md hover:bg-white/80 transition-colors">Transfer</button>
+</div>
+</div>
+</div>
+<!-- Quick Stats -->
+<div class="glass-panel rounded-xl p-md md:col-span-4 flex flex-col justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Monthly Income</p>
+<p class="font-headline-md text-headline-md text-on-surface mt-1">$14,250.00</p>
+</div>
+<div class="mt-6 pt-6 border-t border-outline-variant/30">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Monthly Expenses</p>
+<p class="font-headline-md text-headline-md text-on-surface mt-1">$8,420.50</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Chart placeholder -->
+<div class="glass-panel rounded-xl p-md h-96 flex flex-col">
+<h4 class="font-headline-md text-headline-md text-on-surface mb-6">Income vs Expense</h4>
+<div class="flex-1 relative w-full h-full">
+<canvas id="dashboardChart"></canvas>
+</div>
+</div>
+<!-- Recent Activity -->
+<div class="glass-panel rounded-xl p-md flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md text-headline-md text-on-surface">Recent Activity</h4>
+<button class="text-primary font-body-md text-body-md hover:underline" onclick="switchView('ledger')">View All</button>
+</div>
+<div class="flex-1 overflow-y-auto pr-2" id="dashboard-transactions">
+<!-- Populated via JS -->
+</div>
+</div>
+</div>
+</section>
+<!-- View: Ledger -->
+<section class="view-section" id="view-ledger">
+<header class="mb-lg flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Ledger</h2>
+<p class="font-body-md text-body-md text-outline mt-1">Manage and search your transactions.</p>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-md text-body-md flex items-center gap-2" onclick="openModal()">
+<i class="w-4 h-4" data-lucide="plus"></i> New Entry
+                </button>
+</header>
+<div class="glass-panel rounded-xl p-md overflow-hidden flex flex-col">
+<div class="flex flex-col sm:flex-row gap-4 mb-6">
+<div class="relative flex-1">
+<i class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-outline" data-lucide="search"></i>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg border border-surface-dim bg-white/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md text-body-md outline-none" id="searchInput" placeholder="Search transactions..." type="text"/>
+</div>
+<select class="rounded-lg border border-surface-dim bg-white/50 px-4 py-2 font-body-md text-body-md outline-none focus:border-primary">
+<option>All Types</option>
+<option>Income</option>
+<option>Expense</option>
+</select>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-dim">
+<th class="py-3 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Date</th>
+<th class="py-3 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Source</th>
+<th class="py-3 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Category</th>
+<th class="py-3 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider text-right">Amount</th>
+<th class="py-3 px-4 font-label-sm text-label-sm text-outline uppercase tracking-wider text-center">Action</th>
+</tr>
+</thead>
+<tbody id="ledger-table-body">
+<!-- Populated via JS -->
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- View: Scan -->
+<section class="view-section" id="view-scan">
+<header class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Receipt Scanner</h2>
+<p class="font-body-md text-body-md text-outline mt-1">Automate data entry by uploading receipts.</p>
+</header>
+<div class="max-w-2xl mx-auto">
+<div class="glass-panel rounded-xl p-xl border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-pointer hover:bg-white/90 transition-colors group relative overflow-hidden min-h-[400px]" id="dropzone">
+<!-- Initial State -->
+<div class="flex flex-col items-center" id="scan-initial">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<i class="w-8 h-8 text-primary" data-lucide="upload-cloud"></i>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-2">Drag &amp; Drop or Click</h4>
+<p class="font-body-md text-body-md text-outline mb-6">Supports JPG, PNG, PDF up to 10MB</p>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-body-md text-body-md shadow-sm" onclick="startScan(event)">
+                            Simulate Scan
+                        </button>
+</div>
+<!-- Scanning State -->
+<div class="hidden absolute inset-0 w-full h-full" id="scan-active">
+<div class="scanline" id="scanline"></div>
+<img class="w-full h-full object-cover opacity-50 grayscale mix-blend-multiply" data-alt="A macro shot of a crisp, white paper receipt sitting on a dark marble countertop, sharply lit to highlight the printed text, conveying professional expense tracking." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4Z0kXaTo91bV05Vp7Rz4WN8wS15hmSvOiaameDKqeH_5DC0lEU_0aupTMBTaCWWAh8qAdmQ6B-qFNHVQP1_k1R3uDJB_W9zkXhTJrN972bKrQLd3Y_bo8EbwsyGCGTACXGZH2S5VBlIszoOJVBXsGHzbmXz9PpWQxDmkffS1noz75ufDskg9A8a1WXWzMvOYdwyJa2-k3obNL0p3fVDHaBZVyGKG6QkPn_4G67aCO1xtVxA6qfFl3"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-surface/90 backdrop-blur px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+<i class="w-5 h-5 text-primary animate-spin" data-lucide="loader-2"></i>
+<span class="font-body-md text-body-md font-medium text-primary">Extracting data...</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Results State -->
+<div class="hidden mt-6 glass-panel rounded-xl p-md" id="scan-results">
+<h4 class="font-headline-md text-headline-md text-on-surface mb-4">Extracted Information</h4>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Merchant</label>
+<input class="w-full px-3 py-2 rounded border border-surface-dim bg-white/50 font-body-md text-body-md" type="text" value="Apple Store"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Date</label>
+<input class="w-full px-3 py-2 rounded border border-surface-dim bg-white/50 font-body-md text-body-md" type="date" value="2023-10-24"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Amount</label>
+<input class="w-full px-3 py-2 rounded border border-surface-dim bg-white/50 font-body-md text-body-md font-data-tabular" type="text" value="$1,299.00"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Category</label>
+<select class="w-full px-3 py-2 rounded border border-surface-dim bg-white/50 font-body-md text-body-md">
+<option>Equipment</option>
+<option>Software</option>
+<option>Office Supplies</option>
+</select>
+</div>
+</div>
+<div class="flex justify-end gap-3">
+<button class="px-4 py-2 rounded text-outline hover:bg-surface-container transition-colors font-body-md text-body-md" onclick="resetScan()">Discard</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-body-md text-body-md shadow-sm" onclick="saveScan()">Save to Ledger</button>
+</div>
+</div>
+</div>
+</section>
+<!-- View: Analytics -->
+<section class="view-section" id="view-analytics">
+<header class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Analytics</h2>
+<p class="font-body-md text-body-md text-outline mt-1">Budget tracking and financial insights.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Doughnut Chart -->
+<div class="glass-panel rounded-xl p-md h-[400px] flex flex-col items-center justify-center relative">
+<h4 class="font-headline-md text-headline-md text-on-surface self-start absolute top-6 left-6">50/30/20 Rule</h4>
+<div class="w-64 h-64 relative mt-8">
+<canvas id="analyticsChart"></canvas>
+</div>
+</div>
+<!-- Budget Progress -->
+<div class="glass-panel rounded-xl p-md flex flex-col gap-6">
+<h4 class="font-headline-md text-headline-md text-on-surface">Category Budgets</h4>
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-body-md text-body-md font-medium text-on-surface">Housing</span>
+<span class="font-data-tabular text-data-tabular text-outline">$2,400 / $2,500</span>
+</div>
+<div class="w-full bg-surface-dim rounded-full h-2">
+<div class="bg-error h-2 rounded-full" style="width: 96%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-error mt-1 text-right">96% - Nearing limit</p>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-body-md text-body-md font-medium text-on-surface">Food &amp; Dining</span>
+<span class="font-data-tabular text-data-tabular text-outline">$650 / $1,000</span>
+</div>
+<div class="w-full bg-surface-dim rounded-full h-2">
+<div class="bg-secondary h-2 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-body-md text-body-md font-medium text-on-surface">Transportation</span>
+<span class="font-data-tabular text-data-tabular text-outline">$320 / $400</span>
+</div>
+<div class="w-full bg-surface-dim rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Bottom Navigation (from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe lg:hidden bg-white/80 dark:bg-inverse-surface/80 backdrop-blur-xl border-t border-white/50 shadow-lg rounded-t-xl">
+<a class="mobile-nav-item flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl p-2 active:scale-90 transition-transform w-16" data-view="dashboard" href="#" onclick="switchView('dashboard')">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Dashboard</span>
+</a>
+<a class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 active:scale-90 transition-transform w-16" data-view="ledger" href="#" onclick="switchView('ledger')">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Ledger</span>
+</a>
+<a class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 active:scale-90 transition-transform w-16" data-view="scan" href="#" onclick="switchView('scan')">
+<span class="material-symbols-outlined" data-icon="document_scanner">document_scanner</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Scan</span>
+</a>
+<a class="mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 active:scale-90 transition-transform w-16" data-view="analytics" href="#" onclick="switchView('analytics')">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Analytics</span>
+</a>
+</nav>
+<!-- Add Transaction Modal -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center px-4 bg-black/20 backdrop-blur-sm" id="transactionModal">
+<div class="glass-modal rounded-xl w-full max-w-md p-lg relative animate-in fade-in zoom-in-95 duration-200">
+<button class="absolute right-4 top-4 text-outline hover:text-on-surface" onclick="closeModal()">
+<i class="w-5 h-5" data-lucide="x"></i>
+</button>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Add Transaction</h3>
+<form class="flex flex-col gap-4" id="addTransactionForm" onsubmit="handleFormSubmit(event)">
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Type</label>
+<div class="flex gap-4">
+<label class="flex items-center gap-2 font-body-md"><input checked="" class="text-primary focus:ring-primary" name="type" type="radio" value="expense"/> Expense</label>
+<label class="flex items-center gap-2 font-body-md"><input class="text-primary focus:ring-primary" name="type" type="radio" value="income"/> Income</label>
+</div>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Source / Merchant</label>
+<input class="w-full px-3 py-2 rounded-lg border border-surface-dim bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md text-body-md outline-none" id="t-source" required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Amount</label>
+<input class="w-full px-3 py-2 rounded-lg border border-surface-dim bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md text-body-md outline-none font-data-tabular" id="t-amount" required="" step="0.01" type="number"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Date</label>
+<input class="w-full px-3 py-2 rounded-lg border border-surface-dim bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md text-body-md outline-none" id="t-date" required="" type="date"/>
+</div>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-outline block mb-1">Category</label>
+<select class="w-full px-3 py-2 rounded-lg border border-surface-dim bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md text-body-md outline-none" id="t-category">
+<option value="Food &amp; Dining">Food &amp; Dining</option>
+<option value="Transportation">Transportation</option>
+<option value="Housing">Housing</option>
+<option value="Salary">Salary</option>
+<option value="Entertainment">Entertainment</option>
+</select>
+</div>
+<button class="w-full mt-4 bg-primary text-on-primary py-3 rounded-lg font-body-md text-body-md shadow-sm hover:opacity-90 transition-opacity" type="submit">
+                    Save Transaction
+                </button>
+</form>
+</div>
+</div>
+<script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // State Management (Simulated React state)
+        let transactions = [
+            { id: 1, date: '2023-10-24', category: 'Food & Dining', source: 'Whole Foods', amount: 142.50, type: 'expense' },
+            { id: 2, date: '2023-10-23', category: 'Salary', source: 'Tech Corp Inc.', amount: 4250.00, type: 'income' },
+            { id: 3, date: '2023-10-21', category: 'Transportation', source: 'Uber', amount: 24.50, type: 'expense' },
+            { id: 4, date: '2023-10-20', category: 'Housing', source: 'Ovation Apartments', amount: 2400.00, type: 'expense' },
+            { id: 5, date: '2023-10-18', category: 'Entertainment', source: 'Netflix', amount: 15.99, type: 'expense' },
+        ];
+
+        // Format Currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+        };
+
+        // Format Date
+        const formatDate = (dateStr) => {
+            return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        };
+
+        // Render Functions
+        function renderDashboardActivity() {
+            const container = document.getElementById('dashboard-transactions');
+            container.innerHTML = '';
+            transactions.slice(0, 4).forEach(t => {
+                const isExpense = t.type === 'expense';
+                const amountClass = isExpense ? 'text-on-surface' : 'text-secondary';
+                const sign = isExpense ? '-' : '+';
+                
+                container.innerHTML += `
+                    <div class="flex items-center justify-between py-3 border-b border-surface-dim last:border-0">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-outline">
+                                <i data-lucide="${isExpense ? 'shopping-bag' : 'briefcase'}" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="font-body-md text-body-md font-medium text-on-surface">${t.source}</p>
+                                <p class="font-label-sm text-label-sm text-outline">${t.category} • ${formatDate(t.date)}</p>
+                            </div>
+                        </div>
+                        <p class="font-data-tabular text-data-tabular font-medium ${amountClass}">${sign}${formatCurrency(t.amount)}</p>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function renderLedgerTable(data = transactions) {
+            const tbody = document.getElementById('ledger-table-body');
+            tbody.innerHTML = '';
+            data.forEach(t => {
+                const isExpense = t.type === 'expense';
+                const amountClass = isExpense ? 'text-on-surface' : 'text-secondary';
+                const sign = isExpense ? '-' : '+';
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-surface-dim hover:bg-white/40 transition-colors group">
+                        <td class="py-3 px-4 font-body-md text-body-md text-on-surface whitespace-nowrap">${formatDate(t.date)}</td>
+                        <td class="py-3 px-4 font-body-md text-body-md font-medium text-on-surface">${t.source}</td>
+                        <td class="py-3 px-4">
+                            <span class="inline-block px-2 py-1 bg-surface-container rounded text-xs font-medium text-on-surface-variant">${t.category}</span>
+                        </td>
+                        <td class="py-3 px-4 font-data-tabular text-data-tabular text-right ${amountClass}">${sign}${formatCurrency(t.amount)}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteTransaction(${t.id})" class="text-outline hover:text-error opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        // View Switching Logic
+        function switchView(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Show target view
+            document.getElementById(`view-${viewId}`).classList.add('active');
+
+            // Update Desktop Nav Styles (JSON logic)
+            document.querySelectorAll('.nav-item').forEach(el => {
+                if (el.dataset.view === viewId) {
+                    el.className = "nav-item flex items-center gap-3 p-3 rounded-lg text-primary dark:text-primary-fixed-dim bg-primary-fixed/20 active:translate-x-1 duration-200";
+                } else {
+                    el.className = "nav-item flex items-center gap-3 p-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:translate-x-1 duration-200";
+                }
+            });
+
+            // Update Mobile Nav Styles (JSON logic)
+            document.querySelectorAll('.mobile-nav-item').forEach(el => {
+                if (el.dataset.view === viewId) {
+                    el.className = "mobile-nav-item flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl p-2 active:scale-90 transition-transform w-16";
+                } else {
+                    el.className = "mobile-nav-item flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 active:scale-90 transition-transform w-16";
+                }
+            });
+
+            // Re-render specific view data
+            if(viewId === 'dashboard') renderDashboardActivity();
+            if(viewId === 'ledger') renderLedgerTable();
+        }
+
+        // Modal Logic
+        function openModal() {
+            document.getElementById('transactionModal').classList.remove('hidden');
+            document.getElementById('transactionModal').classList.add('flex');
+            // Set today's date
+            document.getElementById('t-date').valueAsDate = new Date();
+        }
+
+        function closeModal() {
+            document.getElementById('transactionModal').classList.add('hidden');
+            document.getElementById('transactionModal').classList.remove('flex');
+            document.getElementById('addTransactionForm').reset();
+        }
+
+        // Form Submit
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const newTx = {
+                id: Date.now(),
+                type: document.querySelector('input[name="type"]:checked').value,
+                source: document.getElementById('t-source').value,
+                amount: parseFloat(document.getElementById('t-amount').value),
+                date: document.getElementById('t-date').value,
+                category: document.getElementById('t-category').value
+            };
+            
+            // Unshift to put at top
+            transactions.unshift(newTx);
+            
+            // Re-render
+            renderDashboardActivity();
+            if(document.getElementById('view-ledger').classList.contains('active')) {
+                renderLedgerTable();
+            }
+            
+            closeModal();
+        }
+
+        // Delete Logic
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            renderLedgerTable();
+            renderDashboardActivity();
+        }
+
+        // Search Logic
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = transactions.filter(t => 
+                t.source.toLowerCase().includes(term) || 
+                t.category.toLowerCase().includes(term)
+            );
+            renderLedgerTable(filtered);
+        });
+
+        // Scanner Logic
+        function startScan(e) {
+            e.stopPropagation();
+            document.getElementById('scan-initial').classList.add('hidden');
+            const active = document.getElementById('scan-active');
+            active.classList.remove('hidden');
+            
+            // Show scanline
+            document.getElementById('scanline').style.display = 'block';
+
+            // Simulate delay
+            setTimeout(() => {
+                active.classList.add('hidden');
+                document.getElementById('dropzone').classList.add('hidden');
+                document.getElementById('scan-results').classList.remove('hidden');
+            }, 2500);
+        }
+
+        function resetScan() {
+            document.getElementById('scan-results').classList.add('hidden');
+            document.getElementById('dropzone').classList.remove('hidden');
+            document.getElementById('scan-initial').classList.remove('hidden');
+            document.getElementById('scanline').style.display = 'none';
+        }
+
+        function saveScan() {
+            const newTx = {
+                id: Date.now(),
+                type: 'expense',
+                source: 'Apple Store',
+                amount: 1299.00,
+                date: '2023-10-24',
+                category: 'Equipment'
+            };
+            transactions.unshift(newTx);
+            resetScan();
+            switchView('ledger');
+        }
+
+        // Charts Initialization
+        function initCharts() {
+            // Dashboard Bar Chart
+            const ctxDash = document.getElementById('dashboardChart');
+            new Chart(ctxDash, {
+                type: 'bar',
+                data: {
+                    labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: [12500, 13000, 12800, 14000, 14250],
+                            backgroundColor: '#4f46e5',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Expense',
+                            data: [8200, 9100, 8500, 8900, 8420],
+                            backgroundColor: '#c7c4d8',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Analytics Doughnut Chart
+            const ctxAnalytic = document.getElementById('analyticsChart');
+            new Chart(ctxAnalytic, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Needs (50%)', 'Wants (30%)', 'Savings (20%)'],
+                    datasets: [{
+                        data: [50, 30, 20],
+                        backgroundColor: ['#4f46e5', '#a44100', '#006c49'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // Initial Render
+        renderDashboardActivity();
+        renderLedgerTable();
+        // Delay chart init slightly to ensure canvas is painted
+        setTimeout(initCharts, 100);
+
+    </script>
+</body></html>

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Bell, UploadCloud, Trash2, TrendingUp } from 'lucide-react';
+// TAMBAHAN: Mengimpor ikon Edit/Pensil dari lucide-react
+import { Bell, UploadCloud, Trash2, TrendingUp, Edit2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 import Sidebar from '@/components/Sidebar';
@@ -10,14 +11,16 @@ import TransactionModal from '@/components/TransactionModal';
 export default function SidanaApp() {
   const [activeView, setActiveView] = useState('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState([]); // Data dimulai dari kosong
-  const [isLoading, setIsLoading] = useState(true); // State untuk efek loading
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // TAMBAHAN: State untuk melacak apakah kita sedang dalam mode Edit
+  const [editingId, setEditingId] = useState(null);
 
   const [newTx, setNewTx] = useState({
     type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0]
   });
 
-  // MENGAMBIL DATA DARI DATABASE SAAT APLIKASI DIBUKA
   useEffect(() => {
     fetchTransactions();
   }, []);
@@ -34,28 +37,45 @@ export default function SidanaApp() {
     }
   };
 
-  // MENGIRIM DATA BARU KE DATABASE
+  // DIPERBARUI: Fungsi ini sekarang bisa Menambah (POST) sekaligus Mengedit (PUT)
   const handleAddTransaction = async (e) => {
     e.preventDefault();
     if (!newTx.amount || !newTx.source) return;
 
     try {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
+      const isEditing = editingId !== null;
+      const url = '/api/transactions';
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const bodyData = {
+        amount: parseFloat(newTx.amount),
+        source: newTx.source,
+        category: newTx.category,
+        type: newTx.type,
+        date: newTx.date
+      };
+
+      if (isEditing) bodyData.id = editingId;
+
+      const res = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: parseFloat(newTx.amount),
-          source: newTx.source,
-          category: newTx.category,
-          type: newTx.type,
-          date: newTx.date
-        })
+        body: JSON.stringify(bodyData)
       });
 
       if (res.ok) {
         const savedTx = await res.json();
-        setTransactions([savedTx, ...transactions]); // Update tampilan tanpa perlu refresh
+        
+        if (isEditing) {
+          // Ganti data lama dengan data baru hasil editan di tampilan
+          setTransactions(transactions.map(tx => tx.id === editingId ? savedTx : tx));
+        } else {
+          // Tambahkan data baru di urutan teratas
+          setTransactions([savedTx, ...transactions]);
+        }
+        
         setIsModalOpen(false);
+        setEditingId(null);
         setNewTx({ type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0] });
       }
     } catch (error) {
@@ -63,8 +83,8 @@ export default function SidanaApp() {
     }
   };
 
-  // MENGHAPUS DATA DARI DATABASE
   const handleDelete = async (id) => {
+    if (!window.confirm("Yakin ingin menghapus transaksi ini?")) return;
     try {
       const res = await fetch(`/api/transactions?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -75,24 +95,49 @@ export default function SidanaApp() {
     }
   };
 
-  // KALKULASI DINAMIS BERDASARKAN DATABASE (Gunakan parseFloat karena tipe NUMERIC PostgreSQL dibaca sebagai string oleh JS)
+  // TAMBAHAN: Fungsi untuk memicu mode Edit dan mengisi form dengan data lama
+  const handleEditClick = (tx) => {
+    setEditingId(tx.id);
+    setNewTx({
+      type: tx.type,
+      amount: tx.amount,
+      source: tx.source,
+      category: tx.category,
+      date: new Date(tx.date).toISOString().split('T')[0]
+    });
+    setIsModalOpen(true);
+  };
+
+  // KALKULASI DINAMIS
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const netWorth = totalIncome - totalExpense;
 
-  const data503020 = [
-    { name: 'Kebutuhan (50%)', value: 7500000 },
-    { name: 'Keinginan (30%)', value: 4500000 },
-    { name: 'Investasi (20%)', value: 3000000 },
+  const data503020 = totalIncome > 0 ? [
+    { name: 'Kebutuhan (50%)', value: totalIncome * 0.5 },
+    { name: 'Keinginan (30%)', value: totalIncome * 0.3 },
+    { name: 'Investasi (20%)', value: totalIncome * 0.2 },
+  ] : [
+    { name: 'Belum Ada Pemasukan', value: 1 }
   ];
   const COLORS = ['#4f46e5', '#38bdf8', '#10b981'];
 
-  const monthlyData = [
-    { name: 'Mei', Pemasukan: 12000000, Pengeluaran: 8500000 },
-    { name: 'Jun', Pemasukan: 15000000, Pengeluaran: 9200000 },
-    { name: 'Jul', Pemasukan: 15000000, Pengeluaran: 8800000 },
-    { name: 'Agt', Pemasukan: 16500000, Pengeluaran: 7500000 },
-  ];
+  const getMonthlyData = () => {
+    const grouped = {};
+    const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    sortedTransactions.forEach(tx => {
+      const month = new Date(tx.date).toLocaleDateString('id-ID', { month: 'short' });
+      if (!grouped[month]) grouped[month] = { name: month, Pemasukan: 0, Pengeluaran: 0 };
+      
+      const amount = parseFloat(tx.amount);
+      if (tx.type === 'income') grouped[month].Pemasukan += amount;
+      if (tx.type === 'expense') grouped[month].Pengeluaran += amount;
+    });
+
+    return Object.values(grouped);
+  };
+  const monthlyData = getMonthlyData();
 
   const formatMoney = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
   const formatCompactMoney = (amount) => {
@@ -105,11 +150,9 @@ export default function SidanaApp() {
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-800 font-sans relative">
-      
       <Sidebar activeView={activeView} setActiveView={setActiveView} setIsModalOpen={setIsModalOpen} />
 
       <main className="lg:ml-64 flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full">
-        
         {/* DASHBOARD VIEW */}
         {activeView === 'dashboard' && (
           <section className="space-y-6">
@@ -133,8 +176,8 @@ export default function SidanaApp() {
                 </div>
                 <p className="text-sm text-slate-400 mt-2">Dihitung otomatis dari database Ledger Anda.</p>
                 <div className="mt-8 flex gap-4">
-                  <button onClick={() => { setIsModalOpen(true); setNewTx({...newTx, type: 'income'}); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm">Deposit</button>
-                  <button onClick={() => { setIsModalOpen(true); setNewTx({...newTx, type: 'expense'}); }} className="bg-slate-100 text-indigo-600 px-6 py-2.5 rounded-xl font-medium hover:bg-slate-200 transition-colors">Catat Pengeluaran</button>
+                  <button onClick={() => { setEditingId(null); setIsModalOpen(true); setNewTx({...newTx, type: 'income'}); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm">Deposit</button>
+                  <button onClick={() => { setEditingId(null); setIsModalOpen(true); setNewTx({...newTx, type: 'expense'}); }} className="bg-slate-100 text-indigo-600 px-6 py-2.5 rounded-xl font-medium hover:bg-slate-200 transition-colors">Catat Pengeluaran</button>
                 </div>
               </div>
 
@@ -210,7 +253,16 @@ export default function SidanaApp() {
                       <td className="p-4 text-sm font-bold text-slate-900">{tx.source}</td>
                       <td className="p-4 text-sm text-slate-600"><span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-medium">{tx.category}</span></td>
                       <td className={`p-4 text-sm text-right font-bold tabular-nums ${tx.type === 'expense' ? 'text-slate-900' : 'text-emerald-600'}`}>{tx.type === 'expense' ? '-' : '+'}{formatMoney(tx.amount)}</td>
-                      <td className="p-4 text-center"><button onClick={() => handleDelete(tx.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50"><Trash2 size={16} /></button></td>
+                      <td className="p-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button onClick={() => handleEditClick(tx)} className="text-slate-400 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-indigo-50" title="Edit Data">
+                            <Edit2 size={16} />
+                          </button>
+                          <button onClick={() => handleDelete(tx.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50" title="Hapus Data">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -244,8 +296,14 @@ export default function SidanaApp() {
         )}
       </main>
 
-      <TransactionModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} newTx={newTx} setNewTx={setNewTx} handleAddTransaction={handleAddTransaction} />
-
+      <TransactionModal 
+        isModalOpen={isModalOpen} 
+        setIsModalOpen={setIsModalOpen} 
+        newTx={newTx} 
+        setNewTx={setNewTx} 
+        handleAddTransaction={handleAddTransaction} 
+        editingId={editingId} 
+      />
     </div>
   );
 }

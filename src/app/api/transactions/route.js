@@ -48,3 +48,27 @@ export async function DELETE(request) {
     return NextResponse.json({ error: "Gagal menghapus transaksi" }, { status: 500 });
   }
 }
+
+// PUT: Memperbarui data transaksi yang sudah ada
+export async function PUT(request) {
+  try {
+    const body = await request.json();
+    const { id, amount, source, category, type, date } = body;
+
+    if (!id) return NextResponse.json({ error: "ID tidak ditemukan" }, { status: 400 });
+
+    const query = `
+      UPDATE transactions
+      SET amount = $1, source = $2, category = $3, type = $4, date = $5
+      WHERE id = $6
+      RETURNING *;
+    `;
+    const values = [amount, source, category, type, date, id];
+
+    const result = await pool.query(query, values);
+    return NextResponse.json(result.rows[0]);
+  } catch (error) {
+    console.error("Database Error:", error);
+    return NextResponse.json({ error: "Gagal memperbarui transaksi" }, { status: 500 });
+  }
+}

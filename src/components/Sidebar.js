@@ -9,7 +9,7 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
     return (
       <button 
         onClick={() => setActiveView(id)}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer 
           ${isActive ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
       >
         {icon} {label}
@@ -35,7 +35,7 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
 
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex justify-center items-center gap-2"
+        className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2 cursor-pointer"
       >
         <Plus size={18} /> Tambah Transaksi
       </button>

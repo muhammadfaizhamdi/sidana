@@ -28,7 +28,7 @@ export default function TransactionModal({ isModalOpen, setIsModalOpen, newTx, s
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nominal (Rp)</label>
-            <input type="number" required value={newTx.amount} onChange={(e) => setNewTx({...newTx, amount: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all placeholder:text-slate-300 placeholder:font-normal" placeholder="Contoh: 50000" />
+            <input type="text" inputMode="numeric" required value={newTx.amount ? new Intl.NumberFormat('id-ID').format(newTx.amount) : ''} onChange={(e) => { const rawValue = e.target.value.replace(/\./g, ''); if (!isNaN(rawValue)) { setNewTx({ ...newTx, amount: rawValue }); } }} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all placeholder:text-slate-300 placeholder:font-normal" placeholder="Contoh: 50.000" />
           </div>
 
           <div>

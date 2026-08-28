@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 // TAMBAHAN: Mengimpor ikon Edit/Pensil dari lucide-react
-import { Bell, UploadCloud, Trash2, TrendingUp, Edit2 } from 'lucide-react';
+import { Bell, UploadCloud, Trash2, TrendingUp, Edit2, User } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 import Sidebar from '@/components/Sidebar';
@@ -161,9 +161,14 @@ export default function SidanaApp() {
                 <h2 className="text-3xl font-bold tracking-tight text-slate-900">Financial Overview</h2>
                 <p className="text-slate-500 mt-1">Selamat datang kembali, pantau status finansial Anda secara real-time.</p>
               </div>
-              <button onClick={() => alert("Notifikasi sistem aktif.")} className="p-2.5 bg-white border border-slate-200 rounded-full hover:bg-slate-50 transition-colors shadow-sm">
-                <Bell size={20} className="text-slate-600" />
-              </button>
+              <div className="flex items-center gap-3">
+                <button onClick={() => alert("Notifikasi sistem aktif.")} className="p-2.5 bg-white border border-slate-200 rounded-full hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+                  <Bell size={20} className="text-slate-600" />
+                </button>
+                <button onClick={() => alert("Menu Profil")} className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-100 transition-colors shadow-sm cursor-pointer">
+                  <User size={18} />
+                </button>
+              </div>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -197,7 +202,7 @@ export default function SidanaApp() {
               </div>
               <div className="flex flex-col gap-3">
                 {transactions.slice(0, 3).map(tx => (
-                  <div key={tx.id} className="flex justify-between items-center py-3 border-b border-slate-100 last:border-0">
+                  <div key={tx.id} className="flex justify-between items-center py-3 px-3 -mx-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors cursor-default rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-semibold">{tx.source.charAt(0)}</div>
                       <div>
@@ -248,17 +253,17 @@ export default function SidanaApp() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {transactions.map(tx => (
-                    <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={tx.id} className="hover:bg-slate-50 transition-colors cursor-default">
                       <td className="p-4 text-sm text-slate-600">{new Date(tx.date).toLocaleDateString('id-ID')}</td>
                       <td className="p-4 text-sm font-bold text-slate-900">{tx.source}</td>
                       <td className="p-4 text-sm text-slate-600"><span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-medium">{tx.category}</span></td>
                       <td className={`p-4 text-sm text-right font-bold tabular-nums ${tx.type === 'expense' ? 'text-slate-900' : 'text-emerald-600'}`}>{tx.type === 'expense' ? '-' : '+'}{formatMoney(tx.amount)}</td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button onClick={() => handleEditClick(tx)} className="text-slate-400 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-indigo-50" title="Edit Data">
+                          <button onClick={() => handleEditClick(tx)} className="text-slate-400 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-indigo-50 cursor-pointer" title="Edit Data">
                             <Edit2 size={16} />
                           </button>
-                          <button onClick={() => handleDelete(tx.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50" title="Hapus Data">
+                          <button onClick={() => handleDelete(tx.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50 cursor-pointer" title="Hapus Data">
                             <Trash2 size={16} />
                           </button>
                         </div>

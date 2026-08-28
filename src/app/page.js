@@ -1,10 +1,7 @@
 "use client";
-
 import React, { useState, useEffect } from 'react';
-// TAMBAHAN: Mengimpor ikon Edit/Pensil dari lucide-react
 import { Bell, UploadCloud, Trash2, TrendingUp, Edit2, User } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
 import Sidebar from '@/components/Sidebar';
 import TransactionModal from '@/components/TransactionModal';
 
@@ -13,9 +10,22 @@ export default function SidanaApp() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // TAMBAHAN: State untuk melacak apakah kita sedang dalam mode Edit
   const [editingId, setEditingId] = useState(null);
+  const [isUSD, setIsUSD] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState(15500);
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        const data = await res.json();
+        if (data && data.rates && data.rates.IDR) setExchangeRate(data.rates.IDR);
+      } catch (error) {
+        console.error("Gagal mengambil kurs:", error);
+      }
+    };
+    fetchExchangeRate();
+  }, []);
 
   const [newTx, setNewTx] = useState({
     type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0]
@@ -37,7 +47,6 @@ export default function SidanaApp() {
     }
   };
 
-  // DIPERBARUI: Fungsi ini sekarang bisa Menambah (POST) sekaligus Mengedit (PUT)
   const handleAddTransaction = async (e) => {
     e.preventDefault();
     if (!newTx.amount || !newTx.source) return;
@@ -65,15 +74,11 @@ export default function SidanaApp() {
 
       if (res.ok) {
         const savedTx = await res.json();
-        
         if (isEditing) {
-          // Ganti data lama dengan data baru hasil editan di tampilan
           setTransactions(transactions.map(tx => tx.id === editingId ? savedTx : tx));
         } else {
-          // Tambahkan data baru di urutan teratas
           setTransactions([savedTx, ...transactions]);
         }
-        
         setIsModalOpen(false);
         setEditingId(null);
         setNewTx({ type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0] });
@@ -95,7 +100,6 @@ export default function SidanaApp() {
     }
   };
 
-  // TAMBAHAN: Fungsi untuk memicu mode Edit dan mengisi form dengan data lama
   const handleEditClick = (tx) => {
     setEditingId(tx.id);
     setNewTx({
@@ -108,7 +112,6 @@ export default function SidanaApp() {
     setIsModalOpen(true);
   };
 
-  // KALKULASI DINAMIS
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const netWorth = totalIncome - totalExpense;
@@ -117,29 +120,33 @@ export default function SidanaApp() {
     { name: 'Kebutuhan (50%)', value: totalIncome * 0.5 },
     { name: 'Keinginan (30%)', value: totalIncome * 0.3 },
     { name: 'Investasi (20%)', value: totalIncome * 0.2 },
-  ] : [
-    { name: 'Belum Ada Pemasukan', value: 1 }
-  ];
+  ] : [{ name: 'Belum Ada Pemasukan', value: 1 }];
+  
   const COLORS = ['#4f46e5', '#38bdf8', '#10b981'];
 
   const getMonthlyData = () => {
     const grouped = {};
     const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-
     sortedTransactions.forEach(tx => {
       const month = new Date(tx.date).toLocaleDateString('id-ID', { month: 'short' });
       if (!grouped[month]) grouped[month] = { name: month, Pemasukan: 0, Pengeluaran: 0 };
-      
       const amount = parseFloat(tx.amount);
       if (tx.type === 'income') grouped[month].Pemasukan += amount;
       if (tx.type === 'expense') grouped[month].Pengeluaran += amount;
     });
-
     return Object.values(grouped);
   };
+  
   const monthlyData = getMonthlyData();
 
-  const formatMoney = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  const formatMoney = (amount) => {
+    if (isUSD) {
+      const usdAmount = amount / exchangeRate;
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(usdAmount);
+    }
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+  };
+
   const formatCompactMoney = (amount) => {
     if (amount >= 1000000) return `Rp${(amount / 1000000).toFixed(1)}Jt`;
     if (amount >= 1000) return `Rp${(amount / 1000).toFixed(0)}Rb`;
@@ -153,7 +160,6 @@ export default function SidanaApp() {
       <Sidebar activeView={activeView} setActiveView={setActiveView} setIsModalOpen={setIsModalOpen} />
 
       <main className="lg:ml-64 flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full">
-        {/* DASHBOARD VIEW */}
         {activeView === 'dashboard' && (
           <section className="space-y-6">
             <header className="flex justify-between items-center mb-8">
@@ -172,17 +178,16 @@ export default function SidanaApp() {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="col-span-1 md:col-span-2 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Total Net Worth</p>
+              <div className="col-span-1 md:col-span-2 bg-white p-7 rounded-2xl border border-slate-200 shadow-sm">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Net Worth</p>
                 <div className="flex items-baseline gap-4 mt-2">
                   <h3 className={`text-4xl lg:text-5xl font-extrabold tracking-tight ${netWorth >= 0 ? 'text-slate-900' : 'text-red-500'}`}>{formatMoney(netWorth)}</h3>
                   <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1"><TrendingUp size={16} /> Aktif</span>
                 </div>
                 <p className="text-sm text-slate-400 mt-2">Dihitung otomatis dari database Ledger Anda.</p>
                 <div className="mt-8 flex gap-4">
-                  <button onClick={() => { setEditingId(null); setIsModalOpen(true); setNewTx({...newTx, type: 'income'}); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm">Deposit</button>
-                  <button onClick={() => { setEditingId(null); setIsModalOpen(true); setNewTx({...newTx, type: 'expense'}); }} className="bg-slate-100 text-indigo-600 px-6 py-2.5 rounded-xl font-medium hover:bg-slate-200 transition-colors">Catat Pengeluaran</button>
+                  <button onClick={() => { setEditingId(null); setIsModalOpen(true); setNewTx({...newTx, type: 'income'}); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">Deposit</button>
+                  <button onClick={() => { setEditingId(null); setIsModalOpen(true); setNewTx({...newTx, type: 'expense'}); }} className="bg-slate-100 text-indigo-600 px-6 py-2.5 rounded-xl font-medium hover:bg-slate-200 transition-colors cursor-pointer">Catat Pengeluaran</button>
                 </div>
               </div>
 
@@ -191,14 +196,16 @@ export default function SidanaApp() {
                   <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Strategy Status</p>
                   <div className="text-2xl font-bold text-slate-800 mt-2">On Track 🎯</div>
                 </div>
-                <div className="pt-4 border-t border-slate-100"><p className="text-xs text-slate-500">Alokasi dana 50/30/20 Anda bulan ini sudah optimal.</p></div>
+                <div className="pt-4 border-t border-slate-100">
+                  <p className="text-xs text-slate-500">Alokasi dana 50/30/20 Anda bulan ini sudah optimal.</p>
+                </div>
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <div className="flex justify-between items-center mb-4">
                 <h4 className="text-lg font-bold text-slate-900">Aktivitas Terkini</h4>
-                <button onClick={() => setActiveView('ledger')} className="text-sm text-indigo-600 hover:underline font-medium">Lihat Semua</button>
+                <button onClick={() => setActiveView('ledger')} className="text-sm text-indigo-600 hover:underline font-medium cursor-pointer">Lihat Semua</button>
               </div>
               <div className="flex flex-col gap-3">
                 {transactions.slice(0, 3).map(tx => (
@@ -219,23 +226,21 @@ export default function SidanaApp() {
           </section>
         )}
 
-        {/* SCANNER VIEW */}
         {activeView === 'scan' && (
           <section className="space-y-6 max-w-2xl mx-auto">
-             <header className="mb-6 text-center">
-                <h2 className="text-3xl font-bold text-slate-900">Smart Scanner</h2>
-                <p className="text-slate-500 mt-1">Unggah struk belanja untuk diekstrak otomatis menggunakan AI.</p>
+            <header className="mb-6 text-center">
+              <h2 className="text-3xl font-bold text-slate-900">Smart Scanner</h2>
+              <p className="text-slate-500 mt-1">Unggah struk belanja untuk diekstrak otomatis menggunakan AI.</p>
             </header>
             <div className="bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center shadow-sm hover:border-indigo-400 hover:bg-indigo-50/50 cursor-pointer">
               <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-4"><UploadCloud size={32} /></div>
               <h4 className="text-xl font-bold text-slate-900 mb-2">Tarik & Lepas Dokumen</h4>
               <p className="text-slate-400 mb-6 text-sm">Mendukung format JPG, PNG, PDF (Maks. 10MB)</p>
-              <button onClick={() => alert("Sistem OCR sedang dalam tahap pengembangan.")} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-colors">Simulate Scan</button>
+              <button onClick={() => alert("Sistem OCR sedang dalam tahap pengembangan.")} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-colors cursor-pointer">Simulate Scan</button>
             </div>
           </section>
         )}
 
-        {/* LEDGER VIEW */}
         {activeView === 'ledger' && (
           <section className="space-y-6">
             <header className="flex justify-between items-center mb-6">
@@ -253,19 +258,15 @@ export default function SidanaApp() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {transactions.map(tx => (
-                    <tr key={tx.id} className="hover:bg-slate-50 transition-colors cursor-default">
+                    <tr key={tx.id} className="hover:bg-slate-50 transition-colors cursor-default group">
                       <td className="p-4 text-sm text-slate-600">{new Date(tx.date).toLocaleDateString('id-ID')}</td>
                       <td className="p-4 text-sm font-bold text-slate-900">{tx.source}</td>
                       <td className="p-4 text-sm text-slate-600"><span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-medium">{tx.category}</span></td>
                       <td className={`p-4 text-sm text-right font-bold tabular-nums ${tx.type === 'expense' ? 'text-slate-900' : 'text-emerald-600'}`}>{tx.type === 'expense' ? '-' : '+'}{formatMoney(tx.amount)}</td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button onClick={() => handleEditClick(tx)} className="text-slate-400 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-indigo-50 cursor-pointer" title="Edit Data">
-                            <Edit2 size={16} />
-                          </button>
-                          <button onClick={() => handleDelete(tx.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50 cursor-pointer" title="Hapus Data">
-                            <Trash2 size={16} />
-                          </button>
+                          <button onClick={() => handleEditClick(tx)} className="text-slate-400 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-indigo-50 cursor-pointer" title="Edit Data"><Edit2 size={16} /></button>
+                          <button onClick={() => handleDelete(tx.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50 cursor-pointer" title="Hapus Data"><Trash2 size={16} /></button>
                         </div>
                       </td>
                     </tr>
@@ -276,7 +277,6 @@ export default function SidanaApp() {
           </section>
         )}
 
-        {/* ANALYTICS VIEW */}
         {activeView === 'analytics' && (
           <section className="space-y-6">
             <header className="mb-8">
@@ -299,16 +299,39 @@ export default function SidanaApp() {
             </div>
           </section>
         )}
+
+        {activeView === 'settings' && (
+          <section className="space-y-6">
+            <header className="mb-6">
+              <h2 className="text-3xl font-bold text-slate-900">Pengaturan</h2>
+              <p className="text-slate-500 mt-1 text-sm">Sesuaikan preferensi dan konfigurasi aplikasi Anda.</p>
+            </header>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden max-w-3xl">
+              <div className="p-6 border-b border-slate-100">
+                <h3 className="text-lg font-bold text-slate-900">Preferensi Umum</h3>
+                <p className="text-sm text-slate-500 mt-1">Atur format tampilan dan mata uang standar.</p>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-slate-900 text-base">Tampilkan dalam US Dollar (USD)</p>
+                    <p className="text-sm text-slate-500 mt-1">Konversi seluruh nominal uang ke USD secara real-time.</p>
+                  </div>
+                  <button 
+                    onClick={() => setIsUSD(!isUSD)} 
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer focus:outline-none ${isUSD ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${isUSD ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
       </main>
 
-      <TransactionModal 
-        isModalOpen={isModalOpen} 
-        setIsModalOpen={setIsModalOpen} 
-        newTx={newTx} 
-        setNewTx={setNewTx} 
-        handleAddTransaction={handleAddTransaction} 
-        editingId={editingId} 
-      />
+      <TransactionModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} newTx={newTx} setNewTx={setNewTx} handleAddTransaction={handleAddTransaction} editingId={editingId} />
     </div>
   );
 }

@@ -1,16 +1,15 @@
 import React from 'react';
-import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Plus } from 'lucide-react';
+import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings, Plus } from 'lucide-react';
 
 export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
-  
-  // Komponen Tombol Navigasi Internal
   const NavButton = ({ id, icon, label }) => {
     const isActive = activeView === id;
     return (
-      <button 
+      <button
         onClick={() => setActiveView(id)}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer 
-          ${isActive ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer ${
+          isActive ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+        }`}
       >
         {icon} {label}
       </button>
@@ -25,15 +24,16 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
         </h1>
         <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-semibold">Institutional Grade</p>
       </div>
-      
+
       <nav className="flex flex-col gap-2 flex-1">
         <NavButton id="dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" />
         <NavButton id="ledger" icon={<Receipt size={20} />} label="Ledger" />
         <NavButton id="scan" icon={<ScanLine size={20} />} label="Smart Scanner" />
         <NavButton id="analytics" icon={<PieChartIcon size={20} />} label="Analytics" />
+        <NavButton id="settings" icon={<Settings size={20} />} label="Pengaturan" />
       </nav>
 
-      <button 
+      <button
         onClick={() => setIsModalOpen(true)}
         className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2 cursor-pointer"
       >

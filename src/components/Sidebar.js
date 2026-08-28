@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings, Plus } from 'lucide-react';
+import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings, Target, Plus } from 'lucide-react';
 
 export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
   const NavButton = ({ id, icon, label }) => {
@@ -30,6 +30,7 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
         <NavButton id="ledger" icon={<Receipt size={20} />} label="Ledger" />
         <NavButton id="scan" icon={<ScanLine size={20} />} label="Smart Scanner" />
         <NavButton id="analytics" icon={<PieChartIcon size={20} />} label="Analytics" />
+        <NavButton id="goals" icon={<Target size={20} />} label="Wishlist" />
         <NavButton id="settings" icon={<Settings size={20} />} label="Pengaturan" />
       </nav>
 

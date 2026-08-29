@@ -1,5 +1,7 @@
+"use client";
 import React from 'react';
-import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings, Target, Plus } from 'lucide-react';
+import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings, Target, Plus, LogOut } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
   const NavButton = ({ id, icon, label }) => {
@@ -34,12 +36,22 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
         <NavButton id="settings" icon={<Settings size={20} />} label="Pengaturan" />
       </nav>
 
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2 cursor-pointer"
-      >
-        <Plus size={18} /> Tambah Transaksi
-      </button>
+      <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-slate-200">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2 cursor-pointer w-full"
+        >
+          <Plus size={18} /> Tambah Transaksi
+        </button>
+
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all active:scale-95 cursor-pointer"
+        >
+          <LogOut size={18} />
+          <span>Keluar</span>
+        </button>
+      </div>
     </aside>
   );
 }

@@ -1,57 +1,75 @@
-import { NextResponse } from 'next/server';
-import pool from '@/lib/db'; // Mengambil koneksi database yang kita buat di Tahap 2 sebelumnya
+// BARIS UNTUK MEMATIKAN CACHE (Wajib ada di paling atas)
+export const dynamic = 'force-dynamic';
 
-// GET: Mengambil semua data dari database untuk ditampilkan ke Ledger/Dashboard
+import { NextResponse } from 'next/server';
+import pool from '@/lib/db';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
+
 export async function GET() {
   try {
-    const result = await pool.query('SELECT * FROM transactions ORDER BY date DESC, created_at DESC');
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Akses ditolak" }, { status: 401 });
+
+    const userId = session.user.id;
+    
+    const result = await pool.query(
+      'SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC, created_at DESC',
+      [userId]
+    );
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error("Database Error:", error);
-    return NextResponse.json({ error: "Gagal mengambil data dari database" }, { status: 500 });
+    return NextResponse.json({ error: "Gagal mengambil data" }, { status: 500 });
   }
 }
 
-// POST: Menerima data dari Form Modal dan menyimpannya ke database
 export async function POST(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Akses ditolak" }, { status: 401 });
+
+    const userId = session.user.id;
     const body = await request.json();
     const { amount, source, category, type, date } = body;
 
     const query = `
-      INSERT INTO transactions (amount, source, category, type, date)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO transactions (amount, source, category, type, date, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
     `;
-    const values = [amount, source, category, type, date];
+    const values = [amount, source, category, type, date, userId];
 
     const result = await pool.query(query, values);
     return NextResponse.json(result.rows[0], { status: 201 });
   } catch (error) {
-    console.error("Database Error:", error);
     return NextResponse.json({ error: "Gagal menyimpan transaksi" }, { status: 500 });
   }
 }
 
-// DELETE: Menghapus data dari database berdasarkan ID
 export async function DELETE(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Akses ditolak" }, { status: 401 });
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const userId = session.user.id;
 
     if (!id) return NextResponse.json({ error: "ID tidak ditemukan" }, { status: 400 });
 
-    await pool.query('DELETE FROM transactions WHERE id = $1', [id]);
-    return NextResponse.json({ message: "Transaksi berhasil dihapus" });
+    await pool.query('DELETE FROM transactions WHERE id = $1 AND user_id = $2', [id, userId]);
+    return NextResponse.json({ message: "Berhasil dihapus" });
   } catch (error) {
-    console.error("Database Error:", error);
-    return NextResponse.json({ error: "Gagal menghapus transaksi" }, { status: 500 });
+    return NextResponse.json({ error: "Gagal menghapus" }, { status: 500 });
   }
 }
 
-// PUT: Memperbarui data transaksi yang sudah ada
 export async function PUT(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Akses ditolak" }, { status: 401 });
+
+    const userId = session.user.id;
     const body = await request.json();
     const { id, amount, source, category, type, date } = body;
 
@@ -60,15 +78,14 @@ export async function PUT(request) {
     const query = `
       UPDATE transactions
       SET amount = $1, source = $2, category = $3, type = $4, date = $5
-      WHERE id = $6
+      WHERE id = $6 AND user_id = $7
       RETURNING *;
     `;
-    const values = [amount, source, category, type, date, id];
+    const values = [amount, source, category, type, date, id, userId];
 
     const result = await pool.query(query, values);
     return NextResponse.json(result.rows[0]);
   } catch (error) {
-    console.error("Database Error:", error);
-    return NextResponse.json({ error: "Gagal memperbarui transaksi" }, { status: 500 });
+    return NextResponse.json({ error: "Gagal memperbarui" }, { status: 500 });
   }
 }

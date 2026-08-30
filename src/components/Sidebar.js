@@ -18,6 +18,15 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
     );
   };
 
+  // Fungsi untuk memblokir cache riwayat back browser
+  const handleLogout = async () => {
+    // 1. Hancurkan sesi tanpa redirect bawaan
+    await signOut({ redirect: false });
+    
+    // 2. Timpa memori riwayat Dashboard dengan Landing Page
+    window.location.replace('/');
+  };
+
   return (
     <aside className="w-64 hidden lg:flex flex-col bg-white/80 backdrop-blur-xl border-r border-slate-200 p-6 fixed h-full z-40 shadow-sm">
       <div className="mb-10">
@@ -45,7 +54,7 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
         </button>
 
         <button
-          onClick={() => signOut({ callbackUrl: '/' })}
+          onClick={handleLogout}
           className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all active:scale-95 cursor-pointer"
         >
           <LogOut size={18} />

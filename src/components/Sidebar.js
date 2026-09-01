@@ -1,29 +1,29 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings, Target, Plus, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
-export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
-  const NavButton = ({ id, icon, label }) => {
-    const isActive = activeView === id;
+export default function Sidebar({ setIsModalOpen }) {
+  const pathname = usePathname(); // Mendeteksi URL yang sedang aktif
+
+  const NavLink = ({ href, icon, label }) => {
+    const isActive = pathname === href;
     return (
-      <button
-        onClick={() => setActiveView(id)}
+      <Link
+        href={href}
         className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer ${
           isActive ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
         }`}
       >
         {icon} {label}
-      </button>
+      </Link>
     );
   };
 
-  // Fungsi untuk memblokir cache riwayat back browser
   const handleLogout = async () => {
-    // 1. Hancurkan sesi tanpa redirect bawaan
     await signOut({ redirect: false });
-    
-    // 2. Timpa memori riwayat Dashboard dengan Landing Page
     window.location.replace('/');
   };
 
@@ -37,12 +37,13 @@ export default function Sidebar({ activeView, setActiveView, setIsModalOpen }) {
       </div>
 
       <nav className="flex flex-col gap-2 flex-1">
-        <NavButton id="dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" />
-        <NavButton id="ledger" icon={<Receipt size={20} />} label="Ledger" />
-        <NavButton id="scan" icon={<ScanLine size={20} />} label="Smart Scanner" />
-        <NavButton id="analytics" icon={<PieChartIcon size={20} />} label="Analytics" />
-        <NavButton id="goals" icon={<Target size={20} />} label="Wishlist" />
-        <NavButton id="settings" icon={<Settings size={20} />} label="Pengaturan" />
+        {/* Menggunakan Tautan URL Profesional */}
+        <NavLink href="/dashboard" icon={<LayoutDashboard size={20} />} label="Overview" />
+        <NavLink href="/dashboard/ledger" icon={<Receipt size={20} />} label="Ledger" />
+        <NavLink href="/dashboard/scan" icon={<ScanLine size={20} />} label="Smart Scanner" />
+        <NavLink href="/dashboard/analytics" icon={<PieChartIcon size={20} />} label="Analytics" />
+        <NavLink href="/dashboard/wishlist" icon={<Target size={20} />} label="Wishlist" />
+        <NavLink href="/dashboard/settings" icon={<Settings size={20} />} label="Pengaturan" />
       </nav>
 
       <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-slate-200">

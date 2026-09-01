@@ -45,12 +45,12 @@ export default function AnalyticsPage() {
     return `Rp${amount}`;
   };
 
-  if (isLoading) return <div className="flex h-64 items-center justify-center text-indigo-600 font-bold animate-pulse">Memuat Analytics...</div>;
+  if (isLoading) return <div className="flex h-64 items-center justify-center text-indigo-600 font-bold animate-pulse">Memuat Analisis...</div>;
 
   return (
     <section className="space-y-6">
       <header className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Analytics & Strategy</h2>
+        <h2 className="text-3xl font-bold text-slate-900">Analisis & Strategi</h2>
         <p className="text-slate-500 mt-1">Analisis mendalam untuk memantau kesehatan finansial Anda.</p>
       </header>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

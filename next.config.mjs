@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['192.168.1.54', 'localhost'],
+  // Mengizinkan akses dari HP untuk testing (Masukkan IP Anda di sini)
+  allowedDevOrigins: ['192.168.1.54', '192.168.1.61', 'localhost'],
   
   async headers() {
     return [

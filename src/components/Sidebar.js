@@ -6,7 +6,7 @@ import { LayoutDashboard, Receipt, ScanLine, PieChart as PieChartIcon, Settings,
 import { signOut } from 'next-auth/react';
 
 export default function Sidebar({ setIsModalOpen }) {
-  const pathname = usePathname(); // Mendeteksi URL yang sedang aktif
+  const pathname = usePathname();
 
   const NavLink = ({ href, icon, label }) => {
     const isActive = pathname === href;
@@ -33,13 +33,12 @@ export default function Sidebar({ setIsModalOpen }) {
         <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800">
           Sidana.
         </h1>
-        <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-semibold">Institutional Grade</p>
+        <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-semibold">Manajemen Keuangan</p>
       </div>
 
       <nav className="flex flex-col gap-2 flex-1">
-        {/* Menggunakan Tautan URL Profesional */}
-        <NavLink href="/dashboard" icon={<LayoutDashboard size={20} />} label="Overview" />
-        <NavLink href="/dashboard/ledger" icon={<Receipt size={20} />} label="Ledger" />
+        <NavLink href="/dashboard" icon={<LayoutDashboard size={20} />} label="Beranda" />
+        <NavLink href="/dashboard/ledger" icon={<Receipt size={20} />} label="Riwayat" />
         <NavLink href="/dashboard/scan" icon={<ScanLine size={20} />} label="Smart Scanner" />
         <NavLink href="/dashboard/analytics" icon={<PieChartIcon size={20} />} label="Analytics" />
         <NavLink href="/dashboard/wishlist" icon={<Target size={20} />} label="Wishlist" />
@@ -47,19 +46,11 @@ export default function Sidebar({ setIsModalOpen }) {
       </nav>
 
       <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-slate-200">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2 cursor-pointer w-full"
-        >
+        <button onClick={() => setIsModalOpen(true)} className="bg-indigo-600 text-white py-3 rounded-xl font-medium shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2 cursor-pointer w-full">
           <Plus size={18} /> Tambah Transaksi
         </button>
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all active:scale-95 cursor-pointer"
-        >
-          <LogOut size={18} />
-          <span>Keluar</span>
+        <button onClick={handleLogout} className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all active:scale-95 cursor-pointer">
+          <LogOut size={18} /> Keluar
         </button>
       </div>
     </aside>

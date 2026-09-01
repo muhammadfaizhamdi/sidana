@@ -73,13 +73,13 @@ export default function LedgerPage() {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
   };
 
-  if (isLoading) return <div className="flex h-64 items-center justify-center text-indigo-600 font-bold animate-pulse">Memuat Ledger...</div>;
+  if (isLoading) return <div className="flex h-64 items-center justify-center text-indigo-600 font-bold animate-pulse">Memuat Transaksi...</div>;
 
   return (
     <section className="space-y-6">
       <header className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Transaction Ledger</h2>
+          <h2 className="text-3xl font-bold text-slate-900">Riwayat Transaksi</h2>
           <p className="text-slate-500 mt-1">Catatan komprehensif dari seluruh pergerakan cashflow Anda.</p>
         </div>
       </header>

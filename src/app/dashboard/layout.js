@@ -25,6 +25,11 @@ export default function DashboardLayout({ children }) {
       if (res.ok) {
         setIsModalOpen(false);
         setNewTx({ type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0] });
+        
+        // 1. Sinyal instan untuk komponen Client (Beranda/Riwayat)
+        window.dispatchEvent(new Event('transactionUpdated'));
+        
+        // 2. Sinyal resmi Next.js untuk menyegarkan komponen Server di latar belakang
         router.refresh(); 
       }
     } catch (error) { console.error("Gagal menyimpan:", error); }

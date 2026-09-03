@@ -7,10 +7,26 @@ export default function AnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/transactions')
-      .then(res => res.json())
-      .then(data => { setTransactions(data); setIsLoading(false); })
-      .catch(console.error);
+    const fetchTransactions = async () => {
+      try {
+        const res = await fetch('/api/transactions?t=' + new Date().getTime(), {
+          cache: 'no-store'
+        });
+        const data = await res.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Gagal mengambil data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+    window.addEventListener('transactionUpdated', fetchTransactions);
+
+    return () => {
+      window.removeEventListener('transactionUpdated', fetchTransactions);
+    };
   }, []);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);

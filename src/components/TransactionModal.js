@@ -1,64 +1,158 @@
-import React from 'react';
-import { X } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from 'react';
+import { X, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
-export default function TransactionModal({ isModalOpen, setIsModalOpen, newTx, setNewTx, handleAddTransaction, editingId }) {
+export default function TransactionModal({ 
+  isModalOpen, setIsModalOpen, newTx, setNewTx, handleAddTransaction, editingId 
+}) {
+  // State khusus untuk menampilkan angka dengan titik ribuan di layar
+  const [displayAmount, setDisplayAmount] = useState('');
+
+  // Sinkronisasi angka jika modal dibuka (terutama saat mode Edit di halaman Riwayat)
+  useEffect(() => {
+    if (isModalOpen && newTx.amount) {
+      setDisplayAmount(formatRupiah(newTx.amount.toString()));
+    } else if (!isModalOpen && !editingId) {
+      setDisplayAmount('');
+    }
+  }, [isModalOpen, newTx.amount, editingId]);
+
   if (!isModalOpen) return null;
 
-  const isEditing = editingId !== null && editingId !== undefined;
+  // Fungsi pengubah angka polos menjadi format titik (15000000 -> 15.000.000)
+  const formatRupiah = (value) => {
+    const numberString = value.replace(/[^,\d]/g, '').toString();
+    const split = numberString.split(',');
+    const sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-  const handleAmountChange = (e) => {
-    const rawValue = e.target.value.replace(/\./g, '');
-    if (!isNaN(rawValue)) {
-      setNewTx({ ...newTx, amount: rawValue });
+    if (ribuan) {
+      const separator = sisa ? '.' : '';
+      rupiah += separator + ribuan.join('.');
     }
+    return split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+  };
+
+  // Handler saat pengguna mengetik nominal uang
+  const handleAmountChange = (e) => {
+    const rawValue = e.target.value.replace(/\./g, ''); // Buang titiknya untuk disimpan di database
+    setDisplayAmount(formatRupiah(rawValue));
+    setNewTx({ ...newTx, amount: rawValue });
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200">
-        <div className="flex justify-between items-center p-6 border-b border-slate-100">
-          <h3 className="text-xl font-bold text-slate-900">
-            {isEditing ? 'Edit Transaksi' : 'Tambah Transaksi'}
-          </h3>
-          <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors bg-slate-50 hover:bg-slate-100 p-2 rounded-full cursor-pointer">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
+      <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        
+        <header className="flex justify-between items-center p-6 border-b border-slate-100">
+          <h2 className="text-xl font-bold text-slate-900">
+            {editingId ? 'Edit Transaksi' : 'Catat Transaksi'}
+          </h2>
+          <button 
+            onClick={() => setIsModalOpen(false)}
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
+          >
             <X size={20} />
           </button>
-        </div>
-        
+        </header>
+
         <form onSubmit={handleAddTransaction} className="p-6 space-y-5">
-          <div className="grid grid-cols-2 gap-4 bg-slate-50 p-1.5 rounded-xl">
-            <button type="button" onClick={() => setNewTx({...newTx, type: 'expense'})} className={`py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${newTx.type === 'expense' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Pengeluaran</button>
-            <button type="button" onClick={() => setNewTx({...newTx, type: 'income'})} className={`py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${newTx.type === 'income' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Pemasukan</button>
+          
+          {/* Toggle Jenis Transaksi (Pengeluaran vs Pemasukan) */}
+          <div className="flex gap-3 p-1 bg-slate-100 rounded-2xl">
+            <button
+              type="button"
+              onClick={() => setNewTx({ ...newTx, type: 'expense' })}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                newTx.type === 'expense' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <ArrowDownCircle size={18} /> Pengeluaran
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewTx({ ...newTx, type: 'income' })}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                newTx.type === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <ArrowUpCircle size={18} /> Pemasukan
+            </button>
           </div>
 
+          {/* Input Nominal Rupiah Auto-Format */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nominal (Rp)</label>
-            <input type="text" inputMode="numeric" required value={newTx.amount ? new Intl.NumberFormat('id-ID').format(newTx.amount) : ''} onChange={handleAmountChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all placeholder:text-slate-300 placeholder:font-normal" placeholder="Contoh: 50.000" />
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nominal</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                required
+                value={displayAmount}
+                onChange={handleAmountChange}
+                placeholder="0"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all font-bold text-lg text-slate-900"
+              />
+            </div>
           </div>
 
+          {/* Input Merchant / Sumber */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sumber / Merchant</label>
-            <input type="text" required value={newTx.source} onChange={(e) => setNewTx({...newTx, source: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all placeholder:text-slate-300" placeholder="Contoh: Indomaret, Gaji Bulanan" />
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sumber / Catatan</label>
+            <input
+              type="text"
+              required
+              value={newTx.source}
+              onChange={(e) => setNewTx({ ...newTx, source: e.target.value })}
+              placeholder="Cth: Gaji Bulanan / Beli Kopi"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all text-slate-900 font-medium"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+            {/* Input Kategori */}
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori</label>
-              <select value={newTx.category} onChange={(e) => setNewTx({...newTx, category: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all appearance-none bg-white cursor-pointer">
-                <option>Umum</option><option>Makanan</option><option>Transport</option><option>Belanja</option><option>Tagihan</option><option>Investasi</option>
+              <select
+                value={newTx.category}
+                onChange={(e) => setNewTx({ ...newTx, category: e.target.value })}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all text-slate-900 font-medium appearance-none"
+              >
+                <option value="Umum">Umum</option>
+                <option value="Makanan">Makanan</option>
+                <option value="Transportasi">Transportasi</option>
+                <option value="Belanja">Belanja</option>
+                <option value="Tagihan">Tagihan</option>
+                <option value="Hiburan">Hiburan</option>
+                <option value="Gaji">Gaji</option>
+                <option value="Investasi">Investasi</option>
               </select>
             </div>
+
+            {/* Input Tanggal */}
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal</label>
-              <input type="date" required value={newTx.date} onChange={(e) => setNewTx({...newTx, date: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all cursor-pointer" />
+              <input
+                type="date"
+                required
+                value={newTx.date}
+                onChange={(e) => setNewTx({ ...newTx, date: e.target.value })}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all text-slate-900 font-medium"
+              />
             </div>
           </div>
 
           <div className="pt-2">
-            <button type="submit" className="w-full bg-indigo-600 text-white rounded-xl py-3.5 font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-[0.98] cursor-pointer">
-              {isEditing ? 'Simpan Perubahan' : 'Simpan Transaksi'}
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+            >
+              {editingId ? 'Simpan Perubahan' : 'Simpan Transaksi'}
             </button>
           </div>
+
         </form>
       </div>
     </div>

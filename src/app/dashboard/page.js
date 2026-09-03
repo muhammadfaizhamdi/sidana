@@ -29,7 +29,11 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch('/api/transactions');
+        // PERBAIKAN: Tambahkan timestamp (?t=...) dan cache: 'no-store' 
+        // Ini memaksa Next.js & Browser untuk mengabaikan memori cache dan menarik data segar dari database
+        const res = await fetch('/api/transactions?t=' + new Date().getTime(), {
+          cache: 'no-store'
+        });
         const data = await res.json();
         setTransactions(data);
       } catch (error) {
@@ -38,7 +42,17 @@ export default function DashboardOverview() {
         setIsLoading(false);
       }
     };
+    
+    // Panggil saat halaman pertama kali dibuka
     fetchTransactions();
+
+    // Dengarkan sinyal dari modal
+    window.addEventListener('transactionUpdated', fetchTransactions);
+
+    // Bersihkan listener saat pindah halaman
+    return () => {
+      window.removeEventListener('transactionUpdated', fetchTransactions);
+    };
   }, []);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);

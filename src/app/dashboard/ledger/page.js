@@ -13,7 +13,31 @@ export default function LedgerPage() {
   const [newTx, setNewTx] = useState({ type: 'expense', amount: '', source: '', category: 'Umum', date: '' });
 
   useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        // Tetap gunakan cache-busting agar selalu mendapat data segar
+        const res = await fetch('/api/transactions?t=' + new Date().getTime(), {
+          cache: 'no-store'
+        });
+        const data = await res.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Gagal mengambil data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // 1. Ambil data saat halaman Riwayat pertama kali dibuka
     fetchTransactions();
+
+    // 2. Dengarkan sinyal dari Modal Tambah/Edit Transaksi
+    window.addEventListener('transactionUpdated', fetchTransactions);
+
+    // 3. Bersihkan memori pendengar saat pengguna berpindah halaman
+    return () => {
+      window.removeEventListener('transactionUpdated', fetchTransactions);
+    };
   }, []);
 
   const fetchTransactions = async () => {

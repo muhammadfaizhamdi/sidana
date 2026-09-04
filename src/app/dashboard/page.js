@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardOverview() {
@@ -10,7 +10,7 @@ export default function DashboardOverview() {
   const [exchangeRate, setExchangeRate] = useState(15500);
 
   useEffect(() => {
-    // 1. Membaca pengaturan Mata Uang dari memori browser (Memperbaiki fitur Dollar)
+    // 1. Membaca pengaturan Mata Uang dari memori browser
     const storedCurrency = localStorage.getItem('sidana_isUSD');
     if (storedCurrency === 'true') setIsUSD(true);
 
@@ -29,8 +29,6 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        // PERBAIKAN: Tambahkan timestamp (?t=...) dan cache: 'no-store' 
-        // Ini memaksa Next.js & Browser untuk mengabaikan memori cache dan menarik data segar dari database
         const res = await fetch('/api/transactions?t=' + new Date().getTime(), {
           cache: 'no-store'
         });
@@ -71,14 +69,24 @@ export default function DashboardOverview() {
 
   return (
     <section className="space-y-6">
-      <header className="flex justify-between items-end mb-8">
+      <header className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">Ringkasan Keuangan</h2>
           <p className="text-slate-500 mt-1">Pantau status finansial Anda secara real-time.</p>
         </div>
-        <Link href="/dashboard/analytics" className="hidden md:flex items-center gap-2 text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-colors">
-          Lihat Analisis
-        </Link>
+        
+        {/* Grup Tombol Aksi */}
+        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+          <Link href="/dashboard/analytics" className="hidden sm:flex items-center justify-center gap-2 text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2.5 rounded-xl hover:bg-indigo-100 transition-colors">
+            Lihat Analisis
+          </Link>
+          <button 
+            onClick={() => window.dispatchEvent(new Event('openTransactionModal'))} 
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-indigo-700 active:scale-95 transition-all shrink-0"
+          >
+            <Plus size={18} /> Tambah Transaksi
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

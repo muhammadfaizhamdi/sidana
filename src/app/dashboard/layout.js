@@ -16,6 +16,11 @@ export default function DashboardLayout({ children }) {
 
   // --- LISTENER UNTUK MEMBUKA MODAL DARI HALAMAN MANA SAJA ---
   useEffect(() => {
+    // --- TAMBAHKAN 3 BARIS INI UNTUK MENGINGAT TEMA GELAP ---
+    if (localStorage.getItem('sidana_theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+
     const openModal = () => setIsModalOpen(true);
     window.addEventListener('openTransactionModal', openModal);
     
@@ -62,7 +67,7 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-800 font-sans relative pb-20 lg:pb-0 overflow-x-hidden">
+    <div className="flex min-h-screen font-sans relative pb-20 lg:pb-0 overflow-x-hidden">
       <Sidebar setIsModalOpen={setIsModalOpen} />
       
       <main className="lg:ml-64 flex-1 flex flex-col min-h-screen w-full">

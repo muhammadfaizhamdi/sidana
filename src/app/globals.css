@@ -1,26 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc; /* Warna terang (slate-50) */
+  --foreground: #1e293b; /* Warna teks terang (slate-800) */
+}
+
+/* Saat pengaturan mengirim class .dark, warna ini otomatis mengambil alih */
+.dark {
+  --background: #0f172a; /* Warna gelap gulita (slate-900) */
+  --foreground: #f8fafc; /* Warna teks menjadi putih (slate-50) */
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

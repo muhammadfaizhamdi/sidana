@@ -11,26 +11,21 @@ export default function Sidebar() {
   const NavLink = ({ href, icon, label, onClick }) => {
     const isActive = pathname === href;
     
-    // Jika ada onClick (untuk tombol Keluar), gunakan <button> tapi desainnya persis sama
+    // Pengelompokan class agar rapi dan warna transisinya seimbang antara Terang & Gelap
+    const baseClass = "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer";
+    const activeClass = "bg-indigo-50 text-indigo-600 font-bold dark:bg-indigo-500/15 dark:text-indigo-400";
+    const inactiveClass = "text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-100";
+    
     if (onClick) {
       return (
-        <button
-          onClick={onClick}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-        >
+        <button onClick={onClick} className={`${baseClass} ${inactiveClass}`}>
           {icon} {label}
         </button>
       );
     }
 
-    // Untuk link navigasi biasa
     return (
-      <Link
-        href={href}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full text-left cursor-pointer ${
-          isActive ? 'bg-indigo-50 text-indigo-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-        }`}
-      >
+      <Link href={href} className={`${baseClass} ${isActive ? activeClass : inactiveClass}`}>
         {icon} {label}
       </Link>
     );
@@ -42,12 +37,13 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 hidden lg:flex flex-col bg-white/80 backdrop-blur-xl border-r border-slate-200 p-6 fixed h-full z-40 shadow-sm">
+    <aside className="w-64 hidden lg:flex flex-col bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800 p-6 fixed h-full z-40 shadow-sm transition-colors duration-500">
+      
       <div className="mb-10">
-        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800">
+        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-400 dark:to-indigo-500">
           Sidana.
         </h1>
-        <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-semibold">Manajemen Keuangan</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider font-semibold">Manajemen Keuangan</p>
       </div>
 
       <nav className="flex flex-col gap-2 flex-1">
@@ -59,10 +55,11 @@ export default function Sidebar() {
         <NavLink href="/dashboard/wishlist" icon={<Star size={20} />} label="Wishlist" />
       </nav>
 
-      <div className="flex flex-col gap-2 mt-auto pt-6 border-t border-slate-200">
+      <div className="flex flex-col gap-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800">
         <NavLink href="/dashboard/settings" icon={<Settings size={20} />} label="Pengaturan" />
         <NavLink onClick={handleLogout} icon={<LogOut size={20} />} label="Keluar" />
       </div>
+      
     </aside>
   );
 }

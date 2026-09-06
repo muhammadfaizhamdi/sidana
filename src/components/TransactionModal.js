@@ -25,7 +25,7 @@ export default function TransactionModal({
       }
     };
     if (isModalOpen) fetchCategories();
-  }, [isModalOpen]);
+  }, [isModalOpen, editingId, newTx.category, setNewTx]);
 
   useEffect(() => {
     if (isModalOpen && newTx.amount) {
@@ -63,79 +63,87 @@ export default function TransactionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
-      <div className="bg-white rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-800 rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 transition-colors">
         
-        <header className="flex justify-between items-center p-6 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900">
+        <header className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-700/50">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             {editingId ? 'Edit Transaksi' : 'Catat Transaksi'}
           </h2>
-          <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors">
+          <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors">
             <X size={20} />
           </button>
         </header>
 
         <form onSubmit={handleAddTransaction} className="p-6 space-y-5">
           
-          <div className="flex gap-3 p-1 bg-slate-100 rounded-2xl">
-            <button type="button" onClick={() => setNewTx({ ...newTx, type: 'expense' })} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${newTx.type === 'expense' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+          <div className="flex gap-3 p-1 bg-slate-100 dark:bg-slate-900/50 rounded-2xl transition-colors">
+            <button 
+              type="button" 
+              onClick={() => setNewTx({ ...newTx, type: 'expense' })} 
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${newTx.type === 'expense' ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm border border-slate-200 dark:border-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+            >
               <ArrowDownCircle size={18} /> Pengeluaran
             </button>
-            <button type="button" onClick={() => setNewTx({ ...newTx, type: 'income' })} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${newTx.type === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+            <button 
+              type="button" 
+              onClick={() => setNewTx({ ...newTx, type: 'income' })} 
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${newTx.type === 'income' ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+            >
               <ArrowUpCircle size={18} /> Pemasukan
             </button>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nominal</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Nominal</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
-              <input type="text" inputMode="numeric" required value={displayAmount} onChange={handleAmountChange} placeholder="0" className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all font-bold text-lg text-slate-900" />
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold">Rp</span>
+              <input type="text" inputMode="numeric" required value={displayAmount} onChange={handleAmountChange} placeholder="0" className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all font-bold text-lg text-slate-900 dark:text-white" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sumber / Catatan</label>
-            <input type="text" required value={newTx.source} onChange={(e) => setNewTx({ ...newTx, source: e.target.value })} placeholder="Cth: Nasi Goreng / Gaji" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 font-medium" />
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Sumber / Catatan</label>
+            <input type="text" required value={newTx.source} onChange={(e) => setNewTx({ ...newTx, source: e.target.value })} placeholder="Cth: Nasi Goreng / Gaji" className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 dark:text-white font-medium" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             {/* DROPDOWN KATEGORI 50/30/20 DINAMIS */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori Budget</label>
-              <select required value={newTx.category} onChange={(e) => setNewTx({ ...newTx, category: e.target.value })} className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 font-medium text-sm">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Kategori Budget</label>
+              <select required value={newTx.category} onChange={(e) => setNewTx({ ...newTx, category: e.target.value })} className="w-full px-3 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 dark:text-white font-medium text-sm">
                 
                 {newTx.type === 'expense' ? (
                   <>
-                    <optgroup label="Needs (50% Kebutuhan)">
-                      {needs.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    <optgroup label="Needs (50% Kebutuhan)" className="text-indigo-600 dark:text-indigo-400">
+                      {needs.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>)}
                     </optgroup>
-                    <optgroup label="Wants (30% Keinginan)">
-                      {wants.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    <optgroup label="Wants (30% Keinginan)" className="text-orange-600 dark:text-orange-400">
+                      {wants.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>)}
                     </optgroup>
-                    <optgroup label="Savings (20% Tabungan)">
-                      {savings.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    <optgroup label="Savings (20% Tabungan)" className="text-emerald-600 dark:text-emerald-400">
+                      {savings.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>)}
                     </optgroup>
                   </>
                 ) : (
                   // Kategori Pemasukan
                   <>
-                    <option value="Gaji">Gaji / Upah</option>
-                    <option value="Bonus">Bonus</option>
-                    <option value="Pemberian">Pemberian</option>
-                    <option value="Hasil Investasi">Hasil Investasi</option>
+                    <option value="Gaji" className="text-slate-900 dark:text-white">Gaji / Upah</option>
+                    <option value="Bonus" className="text-slate-900 dark:text-white">Bonus</option>
+                    <option value="Pemberian" className="text-slate-900 dark:text-white">Pemberian</option>
+                    <option value="Hasil Investasi" className="text-slate-900 dark:text-white">Hasil Investasi</option>
                   </>
                 )}
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal</label>
-              <input type="date" required value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 font-medium text-sm" />
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Tanggal</label>
+              <input type="date" required value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="w-full px-3 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 dark:text-white font-medium text-sm [color-scheme:light_dark]" />
             </div>
           </div>
 
           <div className="pt-2">
-            <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all">
+            <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 active:scale-[0.98] transition-all">
               {editingId ? 'Simpan Perubahan' : 'Simpan Transaksi'}
             </button>
           </div>

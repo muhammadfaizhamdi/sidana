@@ -101,14 +101,12 @@ export default function WishlistPage() {
     const parsedAmount = parseFloat(rawAmount);
 
     try {
-      // 1. Tembak API Wishlist untuk menambah progress bar
       await fetch(`/api/wishlist/${depositData.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: parsedAmount })
       });
 
-      // 2. Tembak API Transaksi secara otomatis (Pasti Berhasil!)
       await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,11 +115,10 @@ export default function WishlistPage() {
           amount: parsedAmount,
           source: `Tabungan: ${depositData.title}`,
           category: 'Investasi',
-          date: new Date().toISOString().split('T')[0] // Tanggal hari ini
+          date: new Date().toISOString().split('T')[0]
         })
       });
 
-      // 3. Tutup Modal & Sebarkan Sinyal ke Beranda
       setIsDepositModalOpen(false);
       setDepositData({ id: null, amount: '', title: '' });
       window.dispatchEvent(new Event('transactionUpdated'));
@@ -136,14 +133,14 @@ export default function WishlistPage() {
     setIsDepositModalOpen(true);
   };
 
-  if (isLoading) return <div className="flex h-64 items-center justify-center font-bold text-indigo-600 animate-pulse">Memuat Smart Plan...</div>;
+  if (isLoading) return <div className="flex h-64 items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">Memuat Smart Plan...</div>;
 
   return (
     <section className="space-y-6">
       <header className="flex justify-between items-end mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Target Finansial</h2>
-          <p className="text-slate-500 mt-1 text-sm">Sistem menyarankan tabungan maksimal <span className="font-bold text-indigo-600">{formatRupiah(safeLimit20Percent)}</span> (20% pemasukan).</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">Target Finansial</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm transition-colors duration-500">Sistem menyarankan tabungan maksimal <span className="font-bold text-indigo-600 dark:text-indigo-400">{formatRupiah(safeLimit20Percent)}</span> (20% pemasukan).</p>
         </div>
         <button onClick={() => { setEditingId(null); setNewWishlist({ title: '', target_amount: '', target_date: '' }); setIsAddModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition-colors shrink-0">
           <Plus size={18} /> Target Baru
@@ -162,17 +159,17 @@ export default function WishlistPage() {
           const progressPercent = Math.min((collected / target) * 100, 100);
 
           return (
-            <div key={wish.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col relative overflow-hidden group hover:border-indigo-200 transition-colors">
+            <div key={wish.id} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col relative overflow-hidden group hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-colors duration-500">
               {isAchieved && <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500" />}
               
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isAchieved ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'}`}>
-                    {isAchieved ? <CheckCircle2 size={20} /> : <Star size={20} className={!isAchieved ? "fill-indigo-100" : ""} />}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isAchieved ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'}`}>
+                    {isAchieved ? <CheckCircle2 size={20} /> : <Star size={20} className={!isAchieved ? "fill-indigo-100 dark:fill-indigo-400/20" : ""} />}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 leading-tight">{wish.title}</h3>
-                    <div className="flex items-center gap-1 text-xs text-slate-400 font-medium mt-0.5">
+                    <h3 className="font-bold text-slate-900 dark:text-white leading-tight">{wish.title}</h3>
+                    <div className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                       <Calendar size={12} />
                       <span>{new Date(wish.target_date).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}</span>
                     </div>
@@ -180,41 +177,41 @@ export default function WishlistPage() {
                 </div>
                 
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity -mr-2">
-                  <button onClick={() => handleEditClick(wish)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit">
+                  <button onClick={() => handleEditClick(wish)} className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 rounded-lg transition-colors" title="Edit">
                     <Edit2 size={16} />
                   </button>
-                  <button onClick={() => handleDeleteClick(wish.id)} className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus">
+                  <button onClick={() => handleDeleteClick(wish.id)} className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/20 rounded-lg transition-colors" title="Hapus">
                     <Trash2 size={16} />
                   </button>
                 </div>
               </div>
 
               <div className="mb-4">
-                <p className="text-2xl font-extrabold text-slate-900 tracking-tight">{formatRupiah(target)}</p>
+                <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{formatRupiah(target)}</p>
               </div>
 
               <div className="mb-6">
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="font-medium text-slate-500">Terkumpul {formatRupiah(collected)}</span>
-                  <span className="font-bold text-indigo-600">{Math.round(progressPercent)}%</span>
+                  <span className="font-medium text-slate-500 dark:text-slate-400">Terkumpul {formatRupiah(collected)}</span>
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400">{Math.round(progressPercent)}%</span>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                   <div className={`h-2 rounded-full transition-all duration-1000 ${isAchieved ? 'bg-emerald-500' : 'bg-indigo-600'}`} style={{ width: `${progressPercent}%` }}></div>
                 </div>
               </div>
 
-              <div className="mt-auto pt-4 border-t border-slate-100">
+              <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/50">
                 {!isAchieved ? (
                   <>
                     {isWarning ? (
-                      <div className="flex items-start gap-2 text-rose-600 bg-rose-50 p-3 rounded-xl mb-4 text-xs font-medium border border-rose-100">
+                      <div className="flex items-start gap-2 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 p-3 rounded-xl mb-4 text-xs font-medium border border-rose-100 dark:border-rose-500/20">
                         <AlertCircle size={16} className="shrink-0 mt-0.5" />
                         <p>Tabungan <b>{formatRupiah(recommendedMonthly)}/bln</b> melebihi batas aman 20%.</p>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between text-sm mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <span className="text-slate-500 font-medium">Saran setoran:</span>
-                        <span className="font-bold text-slate-900">{formatRupiah(recommendedMonthly)}</span>
+                      <div className="flex items-center justify-between text-sm mb-4 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span className="text-slate-500 dark:text-slate-400 font-medium">Saran setoran:</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{formatRupiah(recommendedMonthly)}</span>
                       </div>
                     )}
                     
@@ -223,7 +220,7 @@ export default function WishlistPage() {
                     </button>
                   </>
                 ) : (
-                  <div className="w-full py-2.5 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-xl border border-emerald-100 flex justify-center items-center gap-2">
+                  <div className="w-full py-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm font-bold rounded-xl border border-emerald-100 dark:border-emerald-500/20 flex justify-center items-center gap-2">
                     <CheckCircle2 size={16} /> Target Tercapai!
                   </div>
                 )}
@@ -233,12 +230,12 @@ export default function WishlistPage() {
         })}
 
         {wishlists.length === 0 && (
-          <div className="col-span-full py-12 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center px-6">
-            <div className="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-4">
-              <Star size={32} className="fill-indigo-100" />
+          <div className="col-span-full py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center px-6 transition-colors duration-500">
+            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-500 dark:text-indigo-400 rounded-full flex items-center justify-center mb-4">
+              <Star size={32} className="fill-indigo-100 dark:fill-indigo-400/20" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Belum ada target impian</h3>
-            <p className="text-slate-500 text-sm max-w-sm mb-6">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Belum ada target impian</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm mb-6">
               Mulai rencanakan masa depan keuangan Anda dengan menabung secara rutin.
             </p>
             <button onClick={() => { setEditingId(null); setNewWishlist({ title: '', target_amount: '', target_date: '' }); setIsAddModalOpen(true); }} className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition-colors flex items-center gap-2">
@@ -250,26 +247,26 @@ export default function WishlistPage() {
 
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Target' : 'Target Baru'}</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full transition-colors"><X size={18} /></button>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">{editingId ? 'Edit Target' : 'Target Baru'}</h3>
+              <button onClick={() => setIsAddModalOpen(false)} className="p-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-full transition-colors"><X size={18} /></button>
             </div>
             <form onSubmit={handleSaveWishlist} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nama Impian</label>
-                <input type="text" required value={newWishlist.title} onChange={e => setNewWishlist({...newWishlist, title: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl mt-1.5 focus:ring-2 focus:ring-indigo-600 outline-none transition-all font-medium text-slate-900" placeholder="Cth: Kamera Mirrorless" />
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nama Impian</label>
+                <input type="text" required value={newWishlist.title} onChange={e => setNewWishlist({...newWishlist, title: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl mt-1.5 focus:ring-2 focus:ring-indigo-600 outline-none transition-all font-medium text-slate-900 dark:text-white" placeholder="Cth: Kamera Mirrorless" />
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Harga Target (Rp)</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Harga Target (Rp)</label>
                 <div className="relative mt-1.5">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
-                  <input type="text" required value={newWishlist.target_amount} onChange={e => setNewWishlist({...newWishlist, target_amount: formatInputRupiah(e.target.value)})} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-lg text-slate-900 focus:ring-2 focus:ring-indigo-600 outline-none transition-all" placeholder="0" />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold">Rp</span>
+                  <input type="text" required value={newWishlist.target_amount} onChange={e => setNewWishlist({...newWishlist, target_amount: formatInputRupiah(e.target.value)})} className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" placeholder="0" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Target Tercapai Pada</label>
-                <input type="date" required value={newWishlist.target_date} onChange={e => setNewWishlist({...newWishlist, target_date: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl mt-1.5 focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 font-medium" />
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Target Tercapai Pada</label>
+                <input type="date" required value={newWishlist.target_date} onChange={e => setNewWishlist({...newWishlist, target_date: e.target.value})} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl mt-1.5 focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 dark:text-white font-medium [color-scheme:light_dark]" />
               </div>
               <div className="pt-2">
                 <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-sm hover:bg-indigo-700 active:scale-[0.98] transition-all">
@@ -283,16 +280,16 @@ export default function WishlistPage() {
 
       {isDepositModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xl font-bold text-slate-900">Setor Tabungan</h3>
-              <button onClick={() => setIsDepositModalOpen(false)} className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full transition-colors"><X size={18} /></button>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Setor Tabungan</h3>
+              <button onClick={() => setIsDepositModalOpen(false)} className="p-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-full transition-colors"><X size={18} /></button>
             </div>
-            <p className="text-sm text-slate-500 mb-6">Alokasi dana untuk target <span className="font-bold text-slate-900">{depositData.title}</span></p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Alokasi dana untuk target <span className="font-bold text-slate-900 dark:text-white">{depositData.title}</span></p>
             <form onSubmit={handleDeposit}>
               <div className="relative mb-6">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">Rp</span>
-                <input type="text" required value={depositData.amount} onChange={e => setDepositData({...depositData, amount: formatInputRupiah(e.target.value)})} className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl font-black text-2xl text-slate-900 outline-none focus:ring-2 focus:ring-indigo-600 transition-all" />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-lg">Rp</span>
+                <input type="text" required value={depositData.amount} onChange={e => setDepositData({...depositData, amount: formatInputRupiah(e.target.value)})} className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-black text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-600 transition-all" />
               </div>
               <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-sm hover:bg-indigo-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
                 <Wallet size={18} /> Pindahkan Dana

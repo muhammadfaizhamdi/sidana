@@ -1,23 +1,21 @@
 @import "tailwindcss";
 
+/* 1. KUNCI UTAMA: Memaksa Tailwind HANYA mendengar sakelar aplikasi, bukan sistem Windows Anda */
+@variant dark (&:is(.dark *));
+
+/* 2. Warna dasar (Terang) */
 :root {
-  --background: #f8fafc; /* Warna terang (slate-50) */
-  --foreground: #1e293b; /* Warna teks terang (slate-800) */
+  --background: #f8fafc;
+  --foreground: #1e293b;
 }
 
-/* Saat pengaturan mengirim class .dark, warna ini otomatis mengambil alih */
+/* 3. Warna saat sakelar menyala (Gelap) */
 .dark {
-  --background: #0f172a; /* Warna gelap gulita (slate-900) */
-  --foreground: #f8fafc; /* Warna teks menjadi putih (slate-50) */
+  --background: #0f172a;
+  --foreground: #f8fafc;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
 }

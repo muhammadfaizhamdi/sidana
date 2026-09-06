@@ -67,7 +67,7 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen font-sans relative pb-20 lg:pb-0 overflow-x-hidden">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-500 font-sans relative pb-20 lg:pb-0 overflow-x-hidden">
       <Sidebar setIsModalOpen={setIsModalOpen} />
       
       <main className="lg:ml-64 flex-1 flex flex-col min-h-screen w-full">

@@ -1,9 +1,12 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { PieChart, TrendingUp, TrendingDown, Activity, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, BarChart3, PieChart as PieIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useGlobalContext } from '@/components/GlobalProvider';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function AnalyticsPage() {
+  const { formatMoney } = useGlobalContext();
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,8 +28,6 @@ export default function AnalyticsPage() {
     return () => window.removeEventListener('transactionUpdated', fetchData);
   }, []);
 
-  const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   const monthName = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
@@ -46,6 +47,24 @@ export default function AnalyticsPage() {
   }, {});
 
   const sortedCategories = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1]);
+
+  // Persiapan data dan warna untuk Donut Chart
+  const chartData = sortedCategories.map(([name, value]) => ({ name, value }));
+  const COLORS = ['#f43f5e', '#f97316', '#f59e0b', '#8b5cf6', '#06b6d4', '#10b981', '#64748b'];
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg">
+          <p className="font-bold text-slate-900 dark:text-white mb-1">{payload[0].name}</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+            {formatMoney(payload[0].value)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (isLoading) return <div className="flex h-64 items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">Menyusun Laporan Analisis...</div>;
 
@@ -67,84 +86,102 @@ export default function AnalyticsPage() {
         <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col relative overflow-hidden transition-colors duration-500">
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 dark:bg-emerald-500/5 rounded-bl-[100px] -z-0 opacity-50 transition-colors" />
           <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors">
-              <TrendingUp size={20} />
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors"><TrendingUp size={20} /></div>
             <p className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">Pemasukan</p>
           </div>
-          <p className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white relative z-10 transition-colors">{formatRupiah(totalIncome)}</p>
+          <p className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white relative z-10 transition-colors">{formatMoney(totalIncome)}</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col relative overflow-hidden transition-colors duration-500">
           <div className="absolute top-0 right-0 w-24 h-24 bg-rose-50 dark:bg-rose-500/5 rounded-bl-[100px] -z-0 opacity-50 transition-colors" />
           <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center transition-colors">
-              <TrendingDown size={20} />
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center transition-colors"><TrendingDown size={20} /></div>
             <p className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">Pengeluaran</p>
           </div>
-          <p className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white relative z-10 transition-colors">{formatRupiah(totalExpense)}</p>
+          <p className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white relative z-10 transition-colors">{formatMoney(totalExpense)}</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col relative overflow-hidden transition-colors duration-500">
           <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 dark:bg-indigo-500/5 rounded-bl-[100px] -z-0 opacity-50 transition-colors" />
           <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-colors">
-              <BarChart3 size={20} />
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-colors"><BarChart3 size={20} /></div>
             <p className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-xs">Sisa Bersih</p>
           </div>
           <p className={`text-2xl lg:text-3xl font-extrabold relative z-10 transition-colors ${netSavings >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400'}`}>
-            {formatRupiah(netSavings)}
+            {formatMoney(netSavings)}
           </p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm transition-colors duration-500">
+      <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-500">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white transition-colors">Distribusi Pengeluaran</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Pengeluaran terbesar Anda bulan ini berdasarkan kategori.</p>
           </div>
           <div className="hidden sm:flex w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 items-center justify-center transition-colors">
-            <PieChart size={24} />
+            <PieIcon size={24} />
           </div>
         </div>
 
         {sortedCategories.length > 0 ? (
-          <div className="space-y-6">
-            {sortedCategories.map(([category, amount], index) => {
-              const percent = totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0;
-              const colorClass = index === 0 ? 'bg-rose-500' : index === 1 ? 'bg-orange-500' : index === 2 ? 'bg-amber-500' : 'bg-slate-400 dark:bg-slate-500';
-              const textClass = index === 0 ? 'text-rose-600 dark:text-rose-400' : index === 1 ? 'text-orange-600 dark:text-orange-400' : index === 2 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300';
-              const bgClass = index === 0 ? 'bg-rose-50 dark:bg-rose-500/20' : index === 1 ? 'bg-orange-50 dark:bg-orange-500/20' : index === 2 ? 'bg-amber-50 dark:bg-amber-500/20' : 'bg-slate-50 dark:bg-slate-700/50';
+          <div className="flex flex-col lg:flex-row gap-8 items-center">
+            
+            {/* Bagian Kiri: Donut Chart Interaktif */}
+            <div className="w-full lg:w-1/2 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={75}
+                    outerRadius={100}
+                    paddingAngle={3}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
 
-              return (
-                <div key={category} className="group">
-                  <div className="flex justify-between items-end mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md transition-colors ${bgClass} ${textClass}`}>
-                        {category}
-                      </span>
-                      <span className="text-slate-400 dark:text-slate-500 text-sm font-medium">{percent}%</span>
+            {/* Bagian Kanan: Daftar Rincian Progress */}
+            <div className="w-full lg:w-1/2 space-y-5">
+              {sortedCategories.map(([category, amount], index) => {
+                const percent = totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0;
+                const colorHex = COLORS[index % COLORS.length];
+
+                return (
+                  <div key={category} className="group">
+                    <div className="flex justify-between items-end mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: colorHex }} />
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider transition-colors">
+                          {category}
+                        </span>
+                        <span className="text-slate-400 dark:text-slate-500 text-sm font-medium ml-1">{percent}%</span>
+                      </div>
+                      <span className="font-bold text-slate-900 dark:text-white transition-colors">{formatMoney(amount)}</span>
                     </div>
-                    <span className="font-bold text-slate-900 dark:text-white transition-colors">{formatRupiah(amount)}</span>
+                    <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden transition-colors">
+                      <div 
+                        className="h-2 rounded-full transition-all duration-1000" 
+                        style={{ width: `${percent}%`, backgroundColor: colorHex }} 
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden transition-colors">
-                    <div 
-                      className={`h-2.5 rounded-full transition-all duration-1000 ${colorClass}`} 
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="py-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-700/50 text-slate-300 dark:text-slate-500 rounded-full flex items-center justify-center mb-4 transition-colors">
-              <PieChart size={32} />
-            </div>
+            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-700/50 text-slate-300 dark:text-slate-500 rounded-full flex items-center justify-center mb-4 transition-colors"><PieIcon size={32} /></div>
             <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">Belum ada pengeluaran bulan ini.</p>
           </div>
         )}

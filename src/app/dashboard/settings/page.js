@@ -1,37 +1,32 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { Loader2, X } from 'lucide-react';
+import { useGlobalContext } from '@/components/GlobalProvider';
 
 export default function SettingsPage() {
-  const [isUSD, setIsUSD] = useState(false);
+  // Menarik sesi asli dan fungsi mata uang dari Context Global
+  const { data: session } = useSession();
+  const { isUSD, toggleCurrency } = useGlobalContext();
+  
   const [isDark, setIsDark] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   
-  const [profile, setProfile] = useState({ name: 'Pengguna Sidana', email: 'user@sidana.com' });
+  const [profile, setProfile] = useState({ name: 'Memuat...', email: 'Memuat...' });
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [editProfileData, setEditProfileData] = useState({ name: '', email: '' });
 
   useEffect(() => {
-    if (localStorage.getItem('sidana_isUSD') === 'true') setIsUSD(true);
     if (localStorage.getItem('sidana_theme') === 'dark') setIsDark(true);
     
-    const savedName = localStorage.getItem('sidana_user_name');
-    const savedEmail = localStorage.getItem('sidana_user_email');
-    if (savedName || savedEmail) {
+    // Sinkronisasi dengan profil asli pengguna yang login dari database
+    if (session?.user) {
       setProfile({
-        name: savedName || 'Pengguna Sidana',
-        email: savedEmail || 'user@sidana.com'
+        name: session.user.name || 'Pengguna Sidana',
+        email: session.user.email || 'user@sidana.com'
       });
     }
-  }, []);
-
-  const toggleCurrency = () => {
-    const newValue = !isUSD;
-    setIsUSD(newValue);
-    localStorage.setItem('sidana_isUSD', newValue.toString());
-    window.location.reload();
-  };
+  }, [session]);
 
   const toggleDarkMode = () => {
     const newValue = !isDark;
@@ -89,8 +84,7 @@ export default function SettingsPage() {
 
   const saveProfile = (e) => {
     e.preventDefault();
-    localStorage.setItem('sidana_user_name', editProfileData.name);
-    localStorage.setItem('sidana_user_email', editProfileData.email);
+    // Di tahap produksi, ini akan menembak API PUT /api/users untuk mengubah data di database
     setProfile(editProfileData);
     setIsProfileModalOpen(false);
   };
@@ -113,7 +107,7 @@ export default function SettingsPage() {
         {/* KOLOM KIRI */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* KARTU 1 */}
+          {/* KARTU 1: PREFERENSI */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-500">
             <div className="p-6 border-b border-slate-100 dark:border-slate-700/50">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Preferensi Umum</h3>
@@ -150,7 +144,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* KARTU 2 */}
+          {/* KARTU 2: DATA */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-500">
             <div className="p-6 border-b border-slate-100 dark:border-slate-700/50">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akun & Data</h3>
@@ -182,11 +176,11 @@ export default function SettingsPage() {
         {/* KOLOM KANAN: PROFIL */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center text-center transition-colors duration-500">
-            <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center text-3xl font-black mb-4 uppercase">
+            <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center text-3xl font-black mb-4 uppercase transition-colors">
               {profile.name.charAt(0)}
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{profile.name}</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 mb-6">{profile.email}</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white transition-colors">{profile.name}</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 mb-6 transition-colors">{profile.email}</p>
             <button onClick={openProfileModal} className="w-full py-2.5 font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors text-sm">
               Edit Profil
             </button>
@@ -225,7 +219,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="pt-2">
-                <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 active:scale-[0.98] transition-all">
+                <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-indigo-700 active:scale-[0.98] transition-all">
                   Simpan Perubahan
                 </button>
               </div>

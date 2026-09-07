@@ -2,36 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useGlobalContext } from '@/components/GlobalProvider';
 
 export default function DashboardOverview() {
+  const { formatMoney } = useGlobalContext(); // Tarik fungsi format uang dari pusat
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUSD, setIsUSD] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(15500);
-
-  useEffect(() => {
-    // 1. Membaca pengaturan Mata Uang dari memori browser
-    const storedCurrency = localStorage.getItem('sidana_isUSD');
-    if (storedCurrency === 'true') setIsUSD(true);
-
-    const fetchExchangeRate = async () => {
-      try {
-        const res = await fetch('https://open.er-api.com/v6/latest/USD');
-        const data = await res.json();
-        if (data?.rates?.IDR) setExchangeRate(data.rates.IDR);
-      } catch (error) {
-        console.error("Gagal mengambil kurs:", error);
-      }
-    };
-    fetchExchangeRate();
-  }, []);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch('/api/transactions?t=' + new Date().getTime(), {
-          cache: 'no-store'
-        });
+        const res = await fetch('/api/transactions?t=' + new Date().getTime(), { cache: 'no-store' });
         const data = await res.json();
         setTransactions(data);
       } catch (error) {
@@ -41,29 +22,14 @@ export default function DashboardOverview() {
       }
     };
     
-    // Panggil saat halaman pertama kali dibuka
     fetchTransactions();
-
-    // Dengarkan sinyal dari modal
     window.addEventListener('transactionUpdated', fetchTransactions);
-
-    // Bersihkan listener saat pindah halaman
-    return () => {
-      window.removeEventListener('transactionUpdated', fetchTransactions);
-    };
+    return () => window.removeEventListener('transactionUpdated', fetchTransactions);
   }, []);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
   const netWorth = totalIncome - totalExpense;
-
-  const formatMoney = (amount) => {
-    if (isUSD) {
-      const usdAmount = amount / exchangeRate;
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(usdAmount);
-    }
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
-  };
 
   if (isLoading) return <div className="flex h-64 items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold animate-pulse">Memuat Ringkasan...</div>;
 
@@ -74,16 +40,11 @@ export default function DashboardOverview() {
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">Ringkasan Keuangan</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors duration-500">Pantau status finansial Anda secara real-time.</p>
         </div>
-        
-        {/* Grup Tombol Aksi */}
         <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
           <Link href="/dashboard/analytics" className="hidden sm:flex items-center justify-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2.5 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors">
             Lihat Analisis
           </Link>
-          <button 
-            onClick={() => window.dispatchEvent(new Event('openTransactionModal'))} 
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-indigo-700 active:scale-95 transition-all shrink-0"
-          >
+          <button onClick={() => window.dispatchEvent(new Event('openTransactionModal'))} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-indigo-700 active:scale-95 transition-all shrink-0">
             <Plus size={18} /> Tambah Transaksi
           </button>
         </div>

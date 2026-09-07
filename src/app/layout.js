@@ -1,4 +1,5 @@
 import './globals.css'; // Pastikan CSS global dipanggil di sini
+import GlobalProvider from '@/components/GlobalProvider';
 
 export const metadata = {
   title: 'Sidana | Manajemen Keuangan',
@@ -8,8 +9,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="id">
-      <body className="bg-slate-50 text-slate-900 antialiased">
-        {children}
+      <body>
+        <GlobalProvider>
+          {children}
+        </GlobalProvider>
       </body>
     </html>
   );

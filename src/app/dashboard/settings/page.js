@@ -5,8 +5,7 @@ import { Loader2, X } from 'lucide-react';
 import { useGlobalContext } from '@/components/GlobalProvider';
 
 export default function SettingsPage() {
-  // Menarik sesi asli dan fungsi mata uang dari Context Global
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const { isUSD, toggleCurrency } = useGlobalContext();
   
   const [isDark, setIsDark] = useState(false);
@@ -19,7 +18,6 @@ export default function SettingsPage() {
   useEffect(() => {
     if (localStorage.getItem('sidana_theme') === 'dark') setIsDark(true);
     
-    // Sinkronisasi dengan profil asli pengguna yang login dari database
     if (session?.user) {
       setProfile({
         name: session.user.name || 'Pengguna Sidana',
@@ -82,11 +80,32 @@ export default function SettingsPage() {
     setIsProfileModalOpen(true);
   };
 
-  const saveProfile = (e) => {
+  const saveProfile = async (e) => {
     e.preventDefault();
-    // Di tahap produksi, ini akan menembak API PUT /api/users untuk mengubah data di database
-    setProfile(editProfileData);
-    setIsProfileModalOpen(false);
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: editProfileData.name, 
+          email: editProfileData.email 
+        })
+      });
+
+      if (res.ok) {
+        setProfile(editProfileData);
+        setIsProfileModalOpen(false);
+        await update({ 
+          name: editProfileData.name, 
+          email: editProfileData.email 
+        });
+      } else {
+        alert("Gagal memperbarui profil. Email mungkin sudah digunakan.");
+      }
+    } catch (error) {
+      console.error("Gagal terhubung ke API:", error);
+      alert("Terjadi kesalahan sistem.");
+    }
   };
 
   const handleLogout = async () => {
@@ -104,10 +123,7 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* KOLOM KIRI */}
         <div className="lg:col-span-2 space-y-6">
-          
-          {/* KARTU 1: PREFERENSI */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-500">
             <div className="p-6 border-b border-slate-100 dark:border-slate-700/50">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Preferensi Umum</h3>
@@ -144,7 +160,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* KARTU 2: DATA */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-500">
             <div className="p-6 border-b border-slate-100 dark:border-slate-700/50">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akun & Data</h3>
@@ -173,7 +188,6 @@ export default function SettingsPage() {
 
         </div>
 
-        {/* KOLOM KANAN: PROFIL */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center text-center transition-colors duration-500">
             <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center text-3xl font-black mb-4 uppercase transition-colors">
@@ -189,7 +203,6 @@ export default function SettingsPage() {
         
       </div>
 
-      {/* MODAL EDIT PROFIL */}
       {isProfileModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
           <div className="bg-white dark:bg-slate-800 rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">

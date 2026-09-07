@@ -14,9 +14,8 @@ export default function DashboardLayout({ children }) {
     type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0]
   });
 
-  // --- LISTENER UNTUK MEMBUKA MODAL DARI HALAMAN MANA SAJA ---
   useEffect(() => {
-    // --- TAMBAHKAN 3 BARIS INI UNTUK MENGINGAT TEMA GELAP ---
+    // Pengingat Tema Gelap
     if (localStorage.getItem('sidana_theme') === 'dark') {
       document.documentElement.classList.add('dark');
     }
@@ -24,9 +23,7 @@ export default function DashboardLayout({ children }) {
     const openModal = () => setIsModalOpen(true);
     window.addEventListener('openTransactionModal', openModal);
     
-    return () => {
-      window.removeEventListener('openTransactionModal', openModal);
-    };
+    return () => window.removeEventListener('openTransactionModal', openModal);
   }, []);
 
   const handleAddTransaction = async (e) => {
@@ -40,7 +37,6 @@ export default function DashboardLayout({ children }) {
       if (res.ok) {
         setIsModalOpen(false);
         setNewTx({ type: 'expense', amount: '', source: '', category: 'Umum', date: new Date().toISOString().split('T')[0] });
-        
         window.dispatchEvent(new Event('transactionUpdated'));
         router.refresh(); 
       }
@@ -52,14 +48,14 @@ export default function DashboardLayout({ children }) {
     if (isCenter) {
       return (
         <div className="relative -top-6">
-          <Link href={href} className="flex items-center justify-center w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl shadow-indigo-300 border-4 border-white hover:scale-105 active:scale-95 transition-transform">
+          <Link href={href} className="flex items-center justify-center w-14 h-14 bg-indigo-600 dark:bg-indigo-500 text-white rounded-full shadow-xl shadow-indigo-300 dark:shadow-none border-4 border-white dark:border-slate-900 hover:scale-105 active:scale-95 transition-all">
             {icon}
           </Link>
         </div>
       );
     }
     return (
-      <Link href={href} className={`flex flex-col items-center justify-center p-2 transition-colors ${isActive ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-500'}`}>
+      <Link href={href} className={`flex flex-col items-center justify-center p-2 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-300'}`}>
         {icon}
         <span className="text-[10px] font-bold mt-1">{label}</span>
       </Link>
@@ -71,18 +67,13 @@ export default function DashboardLayout({ children }) {
       <Sidebar setIsModalOpen={setIsModalOpen} />
       
       <main className="lg:ml-64 flex-1 flex flex-col min-h-screen w-full">
-        {/* HEADER MOBILE (Menampung Logo, Analytics, dan Pengaturan) */}
-        <header className="lg:hidden bg-white/90 backdrop-blur-xl border-b border-slate-200 fixed top-0 left-0 w-full z-50 px-5 py-4 flex items-center justify-between shadow-sm">
-          <h1 className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800">
+        <header className="lg:hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 fixed top-0 left-0 w-full z-50 px-5 py-4 flex items-center justify-between shadow-sm transition-colors duration-500">
+          <h1 className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-400 dark:to-indigo-500">
             Sidana.
           </h1>
           <div className="flex items-center gap-4">
-            <Link href="/dashboard/analytics" className="text-slate-400 hover:text-indigo-600 transition-colors p-1" title="Analytics">
-              <Activity size={22} />
-            </Link>
-            <Link href="/dashboard/settings" className="text-slate-400 hover:text-indigo-600 transition-colors p-1" title="Pengaturan">
-              <Settings size={22} />
-            </Link>
+            <Link href="/dashboard/analytics" className="text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1"><Activity size={22} /></Link>
+            <Link href="/dashboard/settings" className="text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1"><Settings size={22} /></Link>
           </div>
         </header>
 
@@ -91,8 +82,7 @@ export default function DashboardLayout({ children }) {
         </div>
       </main>
 
-      {/* BOTTOM NAVIGATION MOBILE (Prioritas 5 Fitur Utama) */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-100 px-2 flex justify-around items-end z-40 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pt-2">
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-2 flex justify-around items-end z-40 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-none pt-2 transition-colors duration-500">
         <MobileNavItem href="/dashboard" icon={<LayoutDashboard size={24} />} label="Beranda" />
         <MobileNavItem href="/dashboard/ledger" icon={<Receipt size={24} />} label="Riwayat" />
         <MobileNavItem href="/dashboard/scan" icon={<ScanLine size={24} />} isCenter={true} />
@@ -100,11 +90,7 @@ export default function DashboardLayout({ children }) {
         <MobileNavItem href="/dashboard/wishlist" icon={<Star size={24} />} label="Wishlist" />
       </nav>
 
-      <TransactionModal 
-        isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} 
-        newTx={newTx} setNewTx={setNewTx} 
-        handleAddTransaction={handleAddTransaction} editingId={null} 
-      />
+      <TransactionModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} newTx={newTx} setNewTx={setNewTx} handleAddTransaction={handleAddTransaction} editingId={null} />
     </div>
   );
 }

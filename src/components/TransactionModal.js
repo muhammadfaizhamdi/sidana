@@ -14,14 +14,20 @@ export default function TransactionModal({
       try {
         const res = await fetch('/api/budgets?t=' + new Date().getTime(), { cache: 'no-store' });
         const data = await res.json();
-        setCategories(data);
         
-        // Auto-select kategori pertama jika form baru dibuka dan belum ada kategori
-        if (!editingId && data.length > 0 && !newTx.category) {
-          setNewTx(prev => ({ ...prev, category: data.find(c => c.group_type === 'needs')?.name || data[0].name }));
+        const safeData = Array.isArray(data) ? data : [];
+        setCategories(safeData);
+        
+        // Perbaikan Auto-Select: Jika kategori saat ini ("Umum") tidak valid, paksa pilih kategori asli pertama
+        if (!editingId && safeData.length > 0) {
+          const isCategoryValid = safeData.some(c => c.name === newTx.category);
+          if (!isCategoryValid) {
+            setNewTx(prev => ({ ...prev, category: safeData.find(c => c.group_type === 'needs')?.name || safeData[0].name }));
+          }
         }
       } catch (error) {
         console.error("Gagal mengambil kategori:", error);
+        setCategories([]);
       }
     };
     if (isModalOpen) fetchCategories();
@@ -57,9 +63,10 @@ export default function TransactionModal({
     setNewTx({ ...newTx, amount: rawValue });
   };
 
-  const needs = categories.filter(c => c.group_type === 'needs');
-  const wants = categories.filter(c => c.group_type === 'wants');
-  const savings = categories.filter(c => c.group_type === 'savings');
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const needs = safeCategories.filter(c => c.group_type === 'needs');
+  const wants = safeCategories.filter(c => c.group_type === 'wants');
+  const savings = safeCategories.filter(c => c.group_type === 'savings');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
@@ -107,25 +114,27 @@ export default function TransactionModal({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {/* DROPDOWN KATEGORI 50/30/20 DINAMIS */}
             <div>
               <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Kategori Budget</label>
               <select required value={newTx.category} onChange={(e) => setNewTx({ ...newTx, category: e.target.value })} className="w-full px-3 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all text-slate-900 dark:text-white font-medium text-sm">
                 
                 {newTx.type === 'expense' ? (
-                  <>
-                    <optgroup label="Needs (50% Kebutuhan)" className="text-indigo-600 dark:text-indigo-400">
-                      {needs.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>)}
-                    </optgroup>
-                    <optgroup label="Wants (30% Keinginan)" className="text-orange-600 dark:text-orange-400">
-                      {wants.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>)}
-                    </optgroup>
-                    <optgroup label="Savings (20% Tabungan)" className="text-emerald-600 dark:text-emerald-400">
-                      {savings.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>)}
-                    </optgroup>
-                  </>
+                  safeCategories.length > 0 ? (
+                    <>
+                      <optgroup label="Needs (50% Kebutuhan)" className="text-indigo-600 dark:text-indigo-400">
+                        {needs.length > 0 ? needs.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>) : <option disabled className="text-slate-400">Kosong</option>}
+                      </optgroup>
+                      <optgroup label="Wants (30% Keinginan)" className="text-orange-600 dark:text-orange-400">
+                        {wants.length > 0 ? wants.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>) : <option disabled className="text-slate-400">Kosong</option>}
+                      </optgroup>
+                      <optgroup label="Savings (20% Tabungan)" className="text-emerald-600 dark:text-emerald-400">
+                        {savings.length > 0 ? savings.map(c => <option key={c.id} value={c.name} className="text-slate-900 dark:text-white">{c.name}</option>) : <option disabled className="text-slate-400">Kosong</option>}
+                      </optgroup>
+                    </>
+                  ) : (
+                    <option value="Umum" className="text-slate-900 dark:text-white">Umum (Belum ada kategori)</option>
+                  )
                 ) : (
-                  // Kategori Pemasukan
                   <>
                     <option value="Gaji" className="text-slate-900 dark:text-white">Gaji / Upah</option>
                     <option value="Bonus" className="text-slate-900 dark:text-white">Bonus</option>

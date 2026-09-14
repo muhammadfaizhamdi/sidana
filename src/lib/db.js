@@ -9,9 +9,4 @@ const pool = new Pool({
   connectionTimeoutMillis: 5000,
 });
 
-// Baris ini untuk menguji koneksi secara langsung di terminal
-pool.connect()
-  .then(() => console.log("BERHASIL: Node.js sukses terhubung ke PostgreSQL!"))
-  .catch((err) => console.error("GAGAL: Tidak bisa terhubung. Alasan:", err.message));
-
 export default pool;

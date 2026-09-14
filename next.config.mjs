@@ -1,30 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Mengizinkan akses dari HP untuk testing (Masukkan IP Anda di sini)
-  allowedDevOrigins: ['192.168.1.54', '192.168.1.61', 'localhost'],
-  
   async headers() {
     return [
       {
-        // Mengunci seluruh halaman di dalam dashboard
         source: '/dashboard/:path*',
         headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          },
-          {
-            key: 'Pragma',
-            value: 'no-cache',
-          },
-          {
-            key: 'Expires',
-            value: '0',
-          },
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+          { key: 'Expires', value: '0' },
         ],
       },
     ];
   },
 };
-
 export default nextConfig;

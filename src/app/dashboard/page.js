@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useGlobalContext } from '@/components/GlobalProvider';
 
 export default function DashboardOverview() {
-  const { formatMoney } = useGlobalContext(); // Tarik fungsi format uang dari pusat
+  const { formatMoney } = useGlobalContext();
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,7 +37,9 @@ export default function DashboardOverview() {
     <section className="space-y-6">
       <header className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">Ringkasan Keuangan</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">
+            Ringkasan Finansial
+          </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors duration-500">Pantau status finansial Anda secara real-time.</p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">

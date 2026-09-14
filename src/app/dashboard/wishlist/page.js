@@ -37,14 +37,14 @@ export default function WishlistPage() {
     return () => window.removeEventListener('transactionUpdated', fetchData);
   }, []);
 
-  const incomes = transactions.filter(t => t.type === 'income');
-  let monthsActive = 1;
-  if (incomes.length > 0) {
-    const firstDate = new Date(Math.min(...incomes.map(t => new Date(t.date))));
-    monthsActive = (new Date().getFullYear() - firstDate.getFullYear()) * 12 + (new Date().getMonth() - firstDate.getMonth()) + 1;
-  }
-  const avgMonthlyIncome = incomes.reduce((sum, t) => sum + parseFloat(t.amount), 0) / (monthsActive || 1);
-  const safeLimit20Percent = avgMonthlyIncome * 0.20;
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  
+  const thisMonthIncomes = transactions.filter(t => 
+    t.type === 'income' && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear
+  );
+  const thisMonthIncomeTotal = thisMonthIncomes.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  const safeLimit20Percent = thisMonthIncomeTotal * 0.20;
 
   const getRemainingMonths = (targetDate) => {
     const target = new Date(targetDate);
@@ -71,8 +71,11 @@ export default function WishlistPage() {
   const handleEditClick = (wish) => {
     setEditingId(wish.id);
     const dateObj = new Date(wish.target_date);
+    const roundedAmount = Math.round(parseFloat(wish.target_amount || 0)); // Fix Bug Angka Desimal
+    
     setNewWishlist({
-      title: wish.title, target_amount: formatInputRupiah(wish.target_amount.toString()),
+      title: wish.title, 
+      target_amount: formatInputRupiah(roundedAmount.toString()),
       target_date: `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`
     });
     setIsAddModalOpen(true);
@@ -87,9 +90,21 @@ export default function WishlistPage() {
     e.preventDefault();
     const parsedAmount = parseFloat(depositData.amount.replace(/\./g, ''));
     try {
-      await fetch(`/api/wishlist/${depositData.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: parsedAmount }) });
-      await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'expense', amount: parsedAmount, source: `Tabungan: ${depositData.title}`, category: 'Investasi', date: new Date().toISOString().split('T')[0] }) });
-      setIsDepositModalOpen(false); setDepositData({ id: null, amount: '', title: '' }); window.dispatchEvent(new Event('transactionUpdated')); fetchData();
+      await fetch(`/api/wishlist/${depositData.id}`, { 
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: parsedAmount }) 
+      });
+      
+      // Memotong dari Anggaran & Mencatat ke Ledger
+      await fetch('/api/transactions', { 
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          type: 'expense', amount: parsedAmount, source: `Tabungan: ${depositData.title}`, 
+          category: 'Tabungan Utama', date: new Date().toISOString().split('T')[0] 
+        }) 
+      });
+      
+      setIsDepositModalOpen(false); setDepositData({ id: null, amount: '', title: '' }); 
+      window.dispatchEvent(new Event('transactionUpdated')); fetchData();
     } catch (error) {
       console.error("Gagal memproses setoran:", error);
     }
@@ -100,13 +115,15 @@ export default function WishlistPage() {
     setIsDepositModalOpen(true);
   };
 
-  if (isLoading) return <div className="flex h-64 items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">Memuat Smart Plan...</div>;
+  if (isLoading) return <div className="flex h-64 items-center justify-center font-bold text-indigo-600 dark:text-indigo-400 animate-pulse">Memuat Target Finansial...</div>;
 
   return (
     <section className="space-y-6">
       <header className="flex justify-between items-end mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">Target Finansial</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">
+            Target Finansial
+          </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm transition-colors duration-500">Sistem menyarankan tabungan maksimal <span className="font-bold text-indigo-600 dark:text-indigo-400">{formatMoney(safeLimit20Percent)}</span> (20% pemasukan).</p>
         </div>
         <button onClick={() => { setEditingId(null); setNewWishlist({ title: '', target_amount: '', target_date: '' }); setIsAddModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition-colors shrink-0">
@@ -163,7 +180,7 @@ export default function WishlistPage() {
                     {isWarning ? (
                       <div className="flex items-start gap-2 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 p-3 rounded-xl mb-4 text-xs font-medium border border-rose-100 dark:border-rose-500/20">
                         <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                        <p>Tabungan <b>{formatMoney(recommendedMonthly)}/bln</b> melebihi batas aman 20%.</p>
+                        <p>Tabungan <b>{formatMoney(recommendedMonthly)}/bln</b> melebihi batas 20%.</p>
                       </div>
                     ) : (
                       <div className="flex items-center justify-between text-sm mb-4 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700">

@@ -77,7 +77,9 @@ export default function LedgerPage() {
     <section className="space-y-6">
       <header className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white transition-colors duration-500">Riwayat Transaksi</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors duration-500">
+            Riwayat Transaksi
+          </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors duration-500">Catatan komprehensif dari seluruh pergerakan cashflow Anda.</p>
         </div>
         <button onClick={() => window.dispatchEvent(new Event('openTransactionModal'))} className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-indigo-700 active:scale-95 transition-all shrink-0">
